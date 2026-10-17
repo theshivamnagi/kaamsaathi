@@ -234,7 +234,13 @@ export function DashboardPage({ initialTab = 'home', onNavigateLanding }) {
             <div>
               {/* 1. Hero AI Voice Assistant Banner (Replaced carousel with Google-Search-style AI voice assistant) */}
               <AiVoiceAssistantBanner
-                onOpenGrievance={() => setActiveTab('grievance')}
+                onOpenGrievance={(prefillData) => {
+                  if (prefillData) {
+                    setGrievancePrefill(prefillData)
+                  }
+                  setActiveTab('grievance')
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
                 onOpenSchemes={() => setActiveTab('schemes')}
                 onOpenEarnings={() => setActiveTab('earnings')}
                 onOpenDigiPin={() => setShowDigiPinModal(true)}

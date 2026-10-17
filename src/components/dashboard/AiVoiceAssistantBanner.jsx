@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
   Mic, 
   Sparkles, 
@@ -9,82 +9,107 @@ import {
   CheckCircle2, 
   RotateCcw,
   Search,
-  MessageSquare
+  ShieldCheck,
+  AlertTriangle,
+  FileText,
+  PhoneCall,
+  Clock,
+  MapPin,
+  HelpCircle,
+  ExternalLink,
+  ChevronRight
 } from 'lucide-react'
 
 export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenEarnings, onOpenDigiPin }) {
   const [isListeningModalOpen, setIsListeningModalOpen] = useState(false)
-  const [listeningState, setListeningState] = useState('listening') // 'listening' | 'recognized' | 'answered'
-  const [activeQuery, setActiveQuery] = useState('')
+  // 'recording' (5s delay) | 'processing' (2s delay) | 'answered'
+  const [listeningState, setListeningState] = useState('recording')
+  const [secondsRemaining, setSecondsRemaining] = useState(5)
 
-  const demoQueries = [
-    {
-      text: 'Zomato payout cycle #41 me ₹1,850 ki deduction kyu hui?',
-      answer: 'आपके Zomato साइकिल #41 में ₹1,850 की कटौती "अस्पष्ट पेनल्टी" के रूप में दर्ज है। कोड ऑफ सोशल सिक्योरिटी 2026 के अनुसार आप इसके विरुद्ध शिकायत ड्राफ्ट कर सकते हैं।',
-      actionText: 'शिकायत पत्र ड्राफ्ट करें (Draft Grievance)',
-      actionType: 'grievance'
-    },
-    {
-      text: 'What is my DigiPin code for doorstep delivery?',
-      answer: 'Your delivery hub DigiPin is 110001-DL-8821. It provides 4m x 4m high-precision geospatial address coordinates for accurate doorstep arrival.',
-      actionText: 'View DigiPin Details',
-      actionType: 'digipin'
-    },
-    {
-      text: 'Am I eligible for Ayushman Bharat ₹5 Lakh health insurance?',
-      answer: 'हाँ! ई-श्रम पोर्टल पर पंजीकृत सभी सक्रिय गिग व डिलीवरी पार्टनर्स PM-JAY के तहत ₹5,00,000 कैशलेस अस्पताल कवर के लिए स्वतः पात्र हैं।',
-      actionText: 'योजना विवरण देखें (View Scheme)',
-      actionType: 'schemes'
+  const timerRef = useRef(null)
+  const processingTimerRef = useRef(null)
+
+  const fixedQuestion = 'meri cash on delivery ke paise customer ne pay nahi kiye, is case me meri kya rights hai?'
+  const fixedQuestionHindi = 'मेरी कैश ऑन डिलीवरी के पैसे कस्टमर ने पे नहीं किए, इस केस में मेरी क्या राइट्स हैं?'
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+      if (processingTimerRef.current) clearTimeout(processingTimerRef.current)
     }
-  ]
+  }, [])
 
-  const handleOpenMic = (customQuery = null) => {
+  const handleStartVoiceInteraction = () => {
     setIsListeningModalOpen(true)
-    setListeningState('listening')
-    setActiveQuery('')
+    setListeningState('recording')
+    setSecondsRemaining(5)
 
-    // Simulate auto-listening progression
-    const queryToUse = customQuery || demoQueries[0]
+    if (timerRef.current) clearInterval(timerRef.current)
+    if (processingTimerRef.current) clearTimeout(processingTimerRef.current)
 
-    setTimeout(() => {
-      setActiveQuery(queryToUse.text)
-      setListeningState('recognized')
+    // 5-second recording countdown
+    let currentSeconds = 5
+    timerRef.current = setInterval(() => {
+      currentSeconds -= 1
+      setSecondsRemaining(currentSeconds)
 
-      setTimeout(() => {
-        setListeningState('answered')
-      }, 1200)
-    }, 1800)
+      if (currentSeconds <= 0) {
+        clearInterval(timerRef.current)
+        // Switch to 2-second processing delay
+        setListeningState('processing')
+
+        processingTimerRef.current = setTimeout(() => {
+          setListeningState('answered')
+        }, 2000) // 2 second delay before response
+      }
+    }, 1000)
   }
 
-  const handleResetListening = (queryItem) => {
-    setListeningState('listening')
-    setActiveQuery('')
-    setTimeout(() => {
-      setActiveQuery(queryItem.text)
-      setListeningState('recognized')
-      setTimeout(() => {
-        setListeningState('answered')
-      }, 1200)
-    }, 1500)
+  const handleCloseModal = () => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    if (processingTimerRef.current) clearTimeout(processingTimerRef.current)
+    setIsListeningModalOpen(false)
   }
 
-  const currentAnswer = demoQueries.find((q) => q.text === activeQuery) || demoQueries[0]
+  const handleDraftGrievanceAction = () => {
+    handleCloseModal()
+    if (onOpenGrievance) {
+      onOpenGrievance({
+        company: 'Zomato / Swiggy / Blinkit',
+        amount: 1450,
+        issueCategory: 'cod_discrepancy',
+        whatHappened:
+          'Customer refused to pay Cash On Delivery (COD) amount of ₹1,450 at doorstep. As per Code on Social Security 2020 Sections 114 & 134, delivery partners are not liable for customer non-payment. Discrepancy ticket was submitted within SOP.',
+        desiredOutcome:
+          'Immediate reversal of COD liability, no deduction from wallet or weekly settlement, and protection of partner delivery rating.'
+      })
+    }
+  }
 
   return (
     <>
       <style>{`
-        @keyframes pulseRing {
-          0% { transform: scale(0.95); opacity: 0.8; }
-          50% { transform: scale(1.18); opacity: 0.3; }
-          100% { transform: scale(0.95); opacity: 0.8; }
+        @keyframes pulseRingGoogle {
+          0% { transform: scale(0.92); opacity: 0.85; }
+          50% { transform: scale(1.22); opacity: 0.25; }
+          100% { transform: scale(0.92); opacity: 0.85; }
         }
-        @keyframes bounceDot {
-          0%, 80%, 100% { transform: scale(0); }
-          40% { transform: scale(1); }
+        @keyframes bounceGoogleDot {
+          0%, 80%, 100% { transform: scale(0.3); opacity: 0.4; }
+          40% { transform: scale(1.1); opacity: 1; }
         }
-        @keyframes shimmerBanner {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
+        @keyframes soundWaveBar {
+          0%, 100% { height: 8px; }
+          50% { height: 32px; }
+        }
+        @keyframes modalFadeIn {
+          from { opacity: 0; transform: scale(0.98); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes spinSlow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
 
@@ -121,7 +146,7 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
 
         <div
           style={{
-            padding: '34px 44px',
+            padding: '32px 40px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -157,7 +182,7 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
 
             <h2
               style={{
-                fontSize: '26px',
+                fontSize: '25px',
                 fontWeight: 800,
                 lineHeight: 1.3,
                 color: '#ffffff',
@@ -165,20 +190,20 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
                 letterSpacing: '-0.3px'
               }}
             >
-              Speak to KaamSaathi AI — Hands-Free Voice Search
+              Speak to KaamSaathi AI — Hands-Free Voice Assistant
             </h2>
 
-            <p style={{ fontSize: '13.5px', color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.5, marginBottom: '22px' }}>
-              Tap the microphone to ask in Hindi or English about weekly payout deductions, worker rights, road safety protocols, or welfare schemes.
+            <p style={{ fontSize: '13.5px', color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.5, marginBottom: '20px' }}>
+              Tap the microphone to speak your query. Get instant legal rights, step-by-step guidance with photos, and actionable dispute resolution.
             </p>
 
             {/* Google Search Style Big Voice Pill */}
             <div
-              onClick={() => handleOpenMic()}
+              onClick={handleStartVoiceInteraction}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') handleOpenMic()
+                if (e.key === 'Enter' || e.key === ' ') handleStartVoiceInteraction()
               }}
               style={{
                 backgroundColor: '#ffffff',
@@ -203,8 +228,8 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
                 <Search size={18} color="#0d7e48" style={{ flexShrink: 0 }} />
-                <span style={{ fontSize: '14px', color: '#475569', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  Ask by voice: "मेरा ₹1,850 पेआउट क्यों कटा?" / Tap mic...
+                <span style={{ fontSize: '13.5px', color: '#1e293b', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  "{fixedQuestion}"
                 </span>
               </div>
 
@@ -227,40 +252,37 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
               </div>
             </div>
 
-            {/* Quick Spoken Demo Chips */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '16px' }}>
-              <span style={{ fontSize: '11px', color: '#a7f3d0', fontWeight: 600 }}>Try asking:</span>
-              {demoQueries.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleOpenMic(item)}
-                  style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                    border: '1px solid rgba(255, 255, 255, 0.22)',
-                    borderRadius: '9999px',
-                    padding: '4px 10px',
-                    fontSize: '11.5px',
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    transition: 'all 0.15s ease'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.24)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)')}
-                >
-                  <Mic size={11} color="#86efac" />
-                  <span>{item.text.length > 36 ? item.text.substring(0, 36) + '...' : item.text}</span>
-                </button>
-              ))}
+            {/* Quick Spoken Demo Chip */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '14px' }}>
+              <span style={{ fontSize: '11px', color: '#a7f3d0', fontWeight: 600 }}>Active Voice Query:</span>
+              <button
+                type="button"
+                onClick={handleStartVoiceInteraction}
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  borderRadius: '9999px',
+                  padding: '5px 12px',
+                  fontSize: '11.5px',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.25)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.15)')}
+              >
+                <Mic size={12} color="#86efac" />
+                <span>🎙️ Tap to speak COD non-payment rights question (5s record + 2s AI response)</span>
+              </button>
             </div>
           </div>
 
           {/* Right Column: 3D Sound Wave / Assistant Graphic */}
           <div
-            onClick={() => handleOpenMic()}
+            onClick={handleStartVoiceInteraction}
             style={{
               flexShrink: 0,
               display: 'flex',
@@ -274,8 +296,8 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
             <div
               style={{
                 position: 'relative',
-                width: '130px',
-                height: '130px',
+                width: '124px',
+                height: '124px',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(255, 255, 255, 0.08)',
                 display: 'flex',
@@ -291,7 +313,7 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
                   inset: '-12px',
                   borderRadius: '50%',
                   border: '2px solid rgba(74, 222, 128, 0.4)',
-                  animation: 'pulseRing 2.4s ease-out infinite'
+                  animation: 'pulseRingGoogle 2.4s ease-out infinite'
                 }}
               />
               <div
@@ -300,15 +322,15 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
                   inset: '-24px',
                   borderRadius: '50%',
                   border: '1.5px dashed rgba(74, 222, 128, 0.2)',
-                  animation: 'pulseRing 2.4s ease-out 0.6s infinite'
+                  animation: 'pulseRingGoogle 2.4s ease-out 0.6s infinite'
                 }}
               />
 
               {/* Big Center Mic Icon */}
               <div
                 style={{
-                  width: '74px',
-                  height: '74px',
+                  width: '70px',
+                  height: '70px',
                   borderRadius: '50%',
                   backgroundColor: '#ffffff',
                   display: 'flex',
@@ -317,7 +339,7 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
                   boxShadow: '0 6px 18px rgba(0,0,0,0.2)'
                 }}
               >
-                <Mic size={38} color="#0d7e48" strokeWidth={2.5} />
+                <Mic size={36} color="#0d7e48" strokeWidth={2.5} />
               </div>
             </div>
 
@@ -329,39 +351,42 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
       </div>
 
       {/* =========================================================================
-          GOOGLE VOICE SEARCH STYLE SCREEN (Listening Overlay)
+          FULLSCREEN GOOGLE VOICE SEARCH STYLE OVERLAY (Deep Dark Cinema Mode)
          ========================================================================= */}
       {isListeningModalOpen && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.88)',
-            backdropFilter: 'blur(10px)',
+            // Per user request: background be more dark when recording is happening
+            backgroundColor: listeningState === 'recording' ? 'rgba(3, 7, 12, 0.97)' : 'rgba(5, 10, 18, 0.95)',
+            backdropFilter: 'blur(12px)',
             zIndex: 99999,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '28px 24px 40px 24px',
-            userSelect: 'none',
-            color: '#ffffff'
+            justifyContent: 'flex-start',
+            padding: '24px 20px 32px 20px',
+            color: '#ffffff',
+            overflowY: 'auto',
+            animation: 'modalFadeIn 0.25s ease-out'
           }}
         >
           {/* Top Bar: Back Button & Close */}
           <div
             style={{
               width: '100%',
-              maxWidth: '680px',
+              maxWidth: '840px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              marginBottom: '20px'
             }}
           >
             {/* Click back to return */}
             <button
               type="button"
-              onClick={() => setIsListeningModalOpen(false)}
+              onClick={handleCloseModal}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -376,239 +401,633 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
                 cursor: 'pointer',
                 transition: 'background-color 0.15s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)')}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.22)')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)')}
             >
               <ArrowLeft size={16} />
               <span>Back to Dashboard</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setIsListeningModalOpen(false)}
-              aria-label="Close Voice Screen"
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                border: 'none',
-                color: '#ffffff',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          {/* Center Main Stage (Google Mic Experience) */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              maxWidth: '580px',
-              width: '100%',
-              textAlign: 'center',
-              margin: 'auto 0'
-            }}
-          >
-            {/* STATE 1: LISTENING ANIMATION */}
-            {listeningState === 'listening' && (
-              <>
-                {/* Google-Search Multi-color Pulse Circles */}
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '150px',
-                    height: '150px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '36px'
-                  }}
-                >
-                  {/* Expanding multi-colored sound rings */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: '-20px',
-                      borderRadius: '50%',
-                      border: '3px solid #34a853',
-                      animation: 'pulseRing 1.8s ease-out infinite'
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: '-40px',
-                      borderRadius: '50%',
-                      border: '3px solid #4285f4',
-                      animation: 'pulseRing 1.8s ease-out 0.4s infinite'
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: '-60px',
-                      borderRadius: '50%',
-                      border: '3px solid #ea4335',
-                      animation: 'pulseRing 1.8s ease-out 0.8s infinite'
-                    }}
-                  />
-
-                  {/* Big Glowing Center Mic */}
-                  <div
-                    style={{
-                      width: '92px',
-                      height: '92px',
-                      borderRadius: '50%',
-                      backgroundColor: '#ffffff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 0 35px rgba(52, 168, 83, 0.7)'
-                    }}
-                  >
-                    <Mic size={44} color="#0d7e48" strokeWidth={2.5} />
-                  </div>
-                </div>
-
-                <h3 style={{ fontSize: '26px', fontWeight: 800, margin: '0 0 8px 0', letterSpacing: '-0.3px' }}>
-                  Listening... / सुन रहे हैं...
-                </h3>
-
-                {/* 4 Animated colored bouncing dots (Google Assistant style) */}
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#4285f4', animation: 'bounceDot 1.4s infinite ease-in-out both' }} />
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#ea4335', animation: 'bounceDot 1.4s infinite ease-in-out 0.16s both' }} />
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#fbbc05', animation: 'bounceDot 1.4s infinite ease-in-out 0.32s both' }} />
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#34a853', animation: 'bounceDot 1.4s infinite ease-in-out 0.48s both' }} />
-                </div>
-
-                <p style={{ fontSize: '14px', color: '#94a3b8', margin: 0 }}>
-                  Speak now in Hindi or English (बोलना शुरू करें...)
-                </p>
-              </>
-            )}
-
-            {/* STATE 2: RECOGNIZED VOICE */}
-            {listeningState === 'recognized' && (
-              <>
-                <div
-                  style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '50%',
-                    backgroundColor: '#10b981',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '24px',
-                    boxShadow: '0 0 25px rgba(16, 185, 129, 0.5)'
-                  }}
-                >
-                  <Volume2 size={32} color="#ffffff" />
-                </div>
-
-                <div style={{ fontSize: '12px', color: '#86efac', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
-                  Voice Recognized • आवाज़ पहचानी गई
-                </div>
-
-                <div
-                  style={{
-                    fontSize: '22px',
-                    fontWeight: 700,
-                    color: '#ffffff',
-                    lineHeight: 1.4,
-                    padding: '0 12px'
-                  }}
-                >
-                  "{activeQuery}"
-                </div>
-              </>
-            )}
-
-            {/* STATE 3: ANSWER CARD */}
-            {listeningState === 'answered' && (
-              <div
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span
                 style={{
-                  backgroundColor: '#ffffff',
-                  color: '#0f172a',
-                  borderRadius: '20px',
-                  padding: '28px',
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-                  textAlign: 'left',
-                  width: '100%',
-                  animation: 'modalSlideIn 0.3s ease'
+                  fontSize: '12px',
+                  color: '#94a3b8',
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  padding: '5px 12px',
+                  borderRadius: '9999px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}
               >
-                {/* Spoken query echo */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Mic size={15} color="#0d7e48" />
+                {listeningState === 'recording' && `🎙️ Recording Live (${secondsRemaining}s left)`}
+                {listeningState === 'processing' && '⏳ AI Legal Processing (2s)...'}
+                {listeningState === 'answered' && '✅ Rights & Action Guide Ready'}
+              </span>
+
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                aria-label="Close Voice Screen"
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                  border: 'none',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background-color 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.24)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)')}
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* =========================================================================
+              PHASE 1: 5-SECOND RECORDING STATE (Deep Dark Background + Fixed Question)
+             ========================================================================= */}
+          {listeningState === 'recording' && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                maxWidth: '680px',
+                width: '100%',
+                textAlign: 'center',
+                marginTop: '40px',
+                animation: 'modalFadeIn 0.3s ease'
+              }}
+            >
+              {/* Google Voice Multi-color Concentric Rings with countdown */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '170px',
+                  height: '170px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '36px'
+                }}
+              >
+                {/* Ring 1 - Google Green */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: '-20px',
+                    borderRadius: '50%',
+                    border: '3px solid #34a853',
+                    animation: 'pulseRingGoogle 2s ease-out infinite'
+                  }}
+                />
+                {/* Ring 2 - Google Blue */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: '-45px',
+                    borderRadius: '50%',
+                    border: '3px solid #4285f4',
+                    animation: 'pulseRingGoogle 2s ease-out 0.4s infinite'
+                  }}
+                />
+                {/* Ring 3 - Google Red */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: '-70px',
+                    borderRadius: '50%',
+                    border: '3px solid #ea4335',
+                    animation: 'pulseRingGoogle 2s ease-out 0.8s infinite'
+                  }}
+                />
+
+                {/* Big Center Glowing Mic Icon */}
+                <div
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 0 45px rgba(52, 168, 83, 0.85)',
+                    position: 'relative'
+                  }}
+                >
+                  <Mic size={48} color="#0d7e48" strokeWidth={2.5} />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      bottom: '8px',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      color: '#0d7e48'
+                    }}
+                  >
+                    {secondsRemaining}s
+                  </span>
+                </div>
+              </div>
+
+              {/* Status Header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <span
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ef4444',
+                    boxShadow: '0 0 10px #ef4444'
+                  }}
+                />
+                <h3 style={{ fontSize: '26px', fontWeight: 800, margin: 0, letterSpacing: '-0.3px', color: '#ffffff' }}>
+                  Listening... / सुन रहे हैं... ({secondsRemaining}s)
+                </h3>
+              </div>
+
+              {/* Animated Audio Equalizer Bars */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', height: '36px', marginBottom: '24px' }}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((bar) => (
+                  <span
+                    key={bar}
+                    style={{
+                      width: '4px',
+                      backgroundColor: bar % 4 === 0 ? '#4285f4' : bar % 4 === 1 ? '#ea4335' : bar % 4 === 2 ? '#fbbc05' : '#34a853',
+                      borderRadius: '2px',
+                      animation: `soundWaveBar 0.9s infinite ease-in-out ${bar * 0.08}s`
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* FIXED QUESTION IN THE RECORDING (As requested by user) */}
+              <div
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.22)',
+                  borderRadius: '16px',
+                  padding: '20px 24px',
+                  maxWidth: '620px',
+                  width: '100%',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)'
+                }}
+              >
+                <div style={{ fontSize: '12px', color: '#86efac', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+                  Captured Spoken Query • रिकॉर्डेड सवाल
+                </div>
+                <div
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    lineHeight: 1.45
+                  }}
+                >
+                  "{fixedQuestion}"
+                </div>
+                <div style={{ fontSize: '13px', color: '#cbd5e1', marginTop: '8px', fontStyle: 'italic' }}>
+                  ({fixedQuestionHindi})
+                </div>
+              </div>
+
+              <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '20px' }}>
+                5-second audio sampling in progress • Recording hands-free query...
+              </p>
+            </div>
+          )}
+
+          {/* =========================================================================
+              PHASE 2: 2-SECOND PROCESSING DELAY (AI Legal Engine Analyzing)
+             ========================================================================= */}
+          {listeningState === 'processing' && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                maxWidth: '620px',
+                width: '100%',
+                textAlign: 'center',
+                marginTop: '60px',
+                animation: 'modalFadeIn 0.3s ease'
+              }}
+            >
+              {/* Spinning AI Ring */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '90px',
+                  height: '90px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '28px'
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '50%',
+                    border: '4px solid rgba(16, 185, 129, 0.2)',
+                    borderTopColor: '#10b981',
+                    animation: 'spinSlow 1s linear infinite'
+                  }}
+                />
+                <Sparkles size={38} color="#10b981" />
+              </div>
+
+              {/* 4 Google Assistant Colored Bouncing Dots */}
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#4285f4', animation: 'bounceGoogleDot 1.2s infinite ease-in-out both' }} />
+                <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ea4335', animation: 'bounceGoogleDot 1.2s infinite ease-in-out 0.16s both' }} />
+                <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#fbbc05', animation: 'bounceGoogleDot 1.2s infinite ease-in-out 0.32s both' }} />
+                <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#34a853', animation: 'bounceGoogleDot 1.2s infinite ease-in-out 0.48s both' }} />
+              </div>
+
+              <h3 style={{ fontSize: '24px', fontWeight: 800, margin: '0 0 10px 0', color: '#ffffff' }}>
+                Analyzing Legal Rights & COD Rules... (2s)
+              </h3>
+              <p style={{ fontSize: '14px', color: '#86efac', margin: '0 0 24px 0', fontWeight: 600 }}>
+                KaamSaathi AI श्रम अधिकार व डिलीवरी पार्टनर सुरक्षा नियमों का विश्लेषण कर रहा है...
+              </p>
+
+              {/* Echo Query Pill */}
+              <div
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  borderRadius: '12px',
+                  padding: '14px 20px',
+                  fontSize: '15px',
+                  color: '#e2e8f0',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  maxWidth: '560px'
+                }}
+              >
+                "{fixedQuestion}"
+              </div>
+            </div>
+          )}
+
+          {/* =========================================================================
+              PHASE 3: COMPREHENSIVE ANSWER WITH PHOTOS, RIGHTS & NEXT ACTIONS
+             ========================================================================= */}
+          {listeningState === 'answered' && (
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '840px',
+                backgroundColor: '#ffffff',
+                color: '#0f172a',
+                borderRadius: '24px',
+                padding: '32px 30px',
+                boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+                animation: 'modalFadeIn 0.35s ease'
+              }}
+            >
+              {/* 1. Spoken Query Header */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
+                  padding: '16px 20px',
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '14px',
+                  marginBottom: '24px'
+                }}
+              >
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ecfdf5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}
+                >
+                  <Mic size={18} color="#0d7e48" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '11.5px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+                    Your Voice Query (आपका सवाल):
                   </div>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
-                    "{activeQuery}"
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginTop: '2px' }}>
+                    "{fixedQuestion}"
+                  </div>
+                </div>
+                <span
+                  style={{
+                    backgroundColor: '#dcfce7',
+                    color: '#15803d',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '4px 10px',
+                    borderRadius: '9999px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <CheckCircle2 size={12} />
+                  AI Verified
+                </span>
+              </div>
+
+              {/* 2. CORE LEGAL RIGHTS (आपके कानूनी अधिकार) */}
+              <div
+                style={{
+                  backgroundColor: '#f0fdf4',
+                  border: '1.5px solid #86efac',
+                  borderRadius: '16px',
+                  padding: '20px 24px',
+                  marginBottom: '28px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <ShieldCheck size={24} color="#0d7e48" />
+                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#064e3b', margin: 0 }}>
+                    आपके कानूनी अधिकार (Your Legal Rights under Indian Law)
+                  </h4>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '10px', padding: '14px', border: '1px solid #bbf7d0' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0d7e48', marginBottom: '4px' }}>
+                      1. व्यक्तिगत देयता शून्य (Zero Personal Liability)
+                    </div>
+                    <p style={{ fontSize: '12.5px', color: '#334155', margin: 0, lineHeight: 1.5 }}>
+                      <strong>Code on Social Security 2020 (धारा 114)</strong> के तहत डिलीवरी पार्टनर कोई वसूली एजेंट (debt collector) नहीं है। ग्राहक द्वारा नकद न देना कंपनी का व्यापारिक नुकसान है, पार्टनर का नहीं।
+                    </p>
+                  </div>
+
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '10px', padding: '14px', border: '1px solid #bbf7d0' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0d7e48', marginBottom: '4px' }}>
+                      2. वॉलेट से कटौती गैर-कानूनी (No Unilateral Deduction)
+                    </div>
+                    <p style={{ fontSize: '12.5px', color: '#334155', margin: 0, lineHeight: 1.5 }}>
+                      यदि आपने सही समय पर घटना की सूचना दी है, तो एग्रीगेटर (Zomato/Swiggy/Amazon/Zepto) आपके फ्लोटिंग कैश या साप्ताहिक पेआउट से यह राशि <strong>जबरन नहीं काट सकता</strong>।
+                    </p>
+                  </div>
+
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '10px', padding: '14px', border: '1px solid #bbf7d0' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0d7e48', marginBottom: '4px' }}>
+                      3. आईडी सस्पेंशन से सुरक्षा (Anti-Penalization)
+                    </div>
+                    <p style={{ fontSize: '12.5px', color: '#334155', margin: 0, lineHeight: 1.5 }}>
+                      ग्राहक के गैर-भुगतान विवाद के कारण आपकी रेटिंग घटाना, आईडी ब्लॉक करना या शैडो-बैन (shadow ban) लगाना अनुचित श्रम व्यवहार (unfair trade practice) है।
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. STEP-BY-STEP EXPLANATION WITH PHOTOS */}
+              <div style={{ marginBottom: '28px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                    कदम-दर-कदम समाधान प्रक्रिया (Step-by-Step Action with Photos)
+                  </h4>
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>
+                    4 Critical Steps to Protect Payout
                   </span>
                 </div>
 
-                {/* AI Response Card */}
-                <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                    <Sparkles size={16} color="#0d7e48" />
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#0d7e48', textTransform: 'uppercase' }}>
-                      KaamSaathi AI Voice Solution
-                    </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  {/* STEP 1 */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                      gap: '20px',
+                      backgroundColor: '#f8fafc',
+                      borderRadius: '16px',
+                      padding: '18px',
+                      border: '1px solid #e2e8f0',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#e0f2fe', color: '#0369a1', fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '9999px', marginBottom: '8px' }}>
+                        STEP 1 • सबसे महत्वपूर्ण कदम
+                      </div>
+                      <h5 style={{ fontSize: '15.5px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
+                        ऐप में कभी भी "Cash Collected" मार्क न करें
+                      </h5>
+                      <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.55, margin: '0 0 10px 0' }}>
+                        जैसे ही ग्राहक पैसे देने से इनकार करे या बहाना बनाए, डिलीवरी पार्सल अपने पास रखें और ऐप में भूलकर भी "कलेक्टेड" न दबाएं। ऑर्डर स्क्रीन पर <strong>"Payment Issue" → "Customer Refused Payment / No Cash"</strong> चुनें।
+                      </p>
+                      <div style={{ fontSize: '12px', color: '#b91c1c', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <AlertTriangle size={14} /> चेतावनी: कलेक्टेड मार्क करने पर कंपनी आपके खाते को देनदार मान लेती है।
+                      </div>
+                    </div>
+                    <div>
+                      <img
+                        src="/images/cod_doorstep_incident.jpg"
+                        alt="Delivery partner handling COD customer payment issue at doorstep"
+                        style={{
+                          width: '100%',
+                          height: '180px',
+                          objectFit: 'cover',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <div style={{ fontSize: '11px', color: '#64748b', marginTop: '6px', textAlign: 'center' }}>
+                        तस्वीर 1: ग्राहक के दरवाजे पर गैर-भुगतान स्थिति में पार्सल हैंडओवर रोकें
+                      </div>
+                    </div>
                   </div>
-                  <p style={{ fontSize: '14px', color: '#166534', lineHeight: 1.55, margin: 0 }}>
-                    {currentAnswer.answer}
-                  </p>
-                </div>
 
-                {/* Action buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                  {/* STEP 2 */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                      gap: '20px',
+                      backgroundColor: '#f8fafc',
+                      borderRadius: '16px',
+                      padding: '18px',
+                      border: '1px solid #e2e8f0',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#fef3c7', color: '#b45309', fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '9999px', marginBottom: '8px' }}>
+                        STEP 2 • 15 मिनट के अंदर
+                      </div>
+                      <h5 style={{ fontSize: '15.5px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
+                        ऐप सपोर्ट पर तुरंत टिकट और डिस्प्यूट लॉग दर्ज करें
+                      </h5>
+                      <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.55, margin: '0 0 10px 0' }}>
+                        राइडर सपोर्ट चैट खोलें और <strong>"Report COD Discrepancy"</strong> टिकट बनाएं। ग्राहक को किए गए कॉल के स्क्रीनशॉट और चैट का प्रमाण संलग्न करें। चैट में सपोर्ट एग्जीक्यूटिव से टिकट आईडी नोट करें।
+                      </p>
+                      <div style={{ fontSize: '12px', color: '#0d7e48', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <CheckCircle2 size={14} /> सपोर्ट टिकट संख्या भविष्य में कानूनी दावे का मुख्य प्रमाण बनेगी।
+                      </div>
+                    </div>
+                    <div>
+                      <img
+                        src="/images/cod_app_report.jpg"
+                        alt="Rider phone showing payment discrepancy ticket screen"
+                        style={{
+                          width: '100%',
+                          height: '180px',
+                          objectFit: 'cover',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <div style={{ fontSize: '11px', color: '#64748b', marginTop: '6px', textAlign: 'center' }}>
+                        तस्वीर 2: ऐप पर 'Payment Discrepancy - Customer Cash Not Received' रिपोर्ट
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* STEP 3 & STEP 4 */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                      gap: '20px',
+                      backgroundColor: '#f8fafc',
+                      borderRadius: '16px',
+                      padding: '18px',
+                      border: '1px solid #e2e8f0',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: '#dcfce7', color: '#15803d', fontSize: '11px', fontWeight: 800, padding: '3px 10px', borderRadius: '9999px', marginBottom: '8px' }}>
+                        STEP 3 & 4 • KaamSaathi कानूनी सुरक्षा
+                      </div>
+                      <h5 style={{ fontSize: '15.5px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
+                        यदि वॉलेट से कटौती हो — 1-क्लिक लीगल नोटिस ड्राफ्ट करें
+                      </h5>
+                      <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.55, margin: '0 0 10px 0' }}>
+                        KaamSaathi का <strong>DigiPin 4m x 4m लोकेशन इंजन</strong> यह साबित करता है कि आप समय पर दरवाजे पर उपस्थित थे। यदि कंपनी आपकी कमाई से कटौती करती है, तो नीचे दिए बटन से कंपनी के नोडल अधिकारी को आधिकारिक विवाद नोटिस भेजें।
+                      </p>
+                      <div style={{ fontSize: '12px', color: '#0369a1', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <ShieldCheck size={14} /> सामाजिक सुरक्षा संहिता 2020: कंपनी को 7 दिनों में जवाब देना अनिवार्य है।
+                      </div>
+                    </div>
+                    <div>
+                      <img
+                        src="/images/cod_legal_protection.jpg"
+                        alt="Legal dispute notice under Code on Social Security 2020"
+                        style={{
+                          width: '100%',
+                          height: '180px',
+                          objectFit: 'cover',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      <div style={{ fontSize: '11px', color: '#64748b', marginTop: '6px', textAlign: 'center' }}>
+                        तस्वीर 3: आधिकारिक KaamSaathi प्रमाणित COD विवाद निवारण नोटिस
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. HIS NEXT ACTIONS (तत्काल अगले कदम) */}
+              <div
+                style={{
+                  borderTop: '1px solid #e2e8f0',
+                  paddingTop: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '14px',
+                  flexWrap: 'wrap'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  {/* Action 1: Draft Grievance */}
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsListeningModalOpen(false)
-                      if (currentAnswer.actionType === 'grievance' && onOpenGrievance) onOpenGrievance()
-                      else if (currentAnswer.actionType === 'schemes' && onOpenSchemes) onOpenSchemes()
-                      else if (currentAnswer.actionType === 'earnings' && onOpenEarnings) onOpenEarnings()
-                      else if (currentAnswer.actionType === 'digipin' && onOpenDigiPin) onOpenDigiPin()
-                    }}
+                    onClick={handleDraftGrievanceAction}
                     style={{
                       backgroundColor: '#0d7e48',
                       color: '#ffffff',
                       border: 'none',
                       borderRadius: '10px',
-                      padding: '11px 20px',
-                      fontSize: '13.5px',
+                      padding: '12px 22px',
+                      fontSize: '14px',
                       fontWeight: 700,
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '8px',
-                      boxShadow: '0 4px 12px rgba(13, 126, 72, 0.25)'
+                      boxShadow: '0 4px 14px rgba(13, 126, 72, 0.3)',
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0a6439'
+                      e.currentTarget.style.transform = 'translateY(-1px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#0d7e48'
+                      e.currentTarget.style.transform = 'none'
                     }}
                   >
-                    <span>{currentAnswer.actionText}</span>
+                    <FileText size={16} />
+                    <span>ड्राफ्ट डिस्प्यूट नोटिस (Draft Grievance Notice)</span>
                     <ArrowRight size={15} />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setListeningState('listening')}
+                  {/* Action 2: Call Labour Helpline */}
+                  <a
+                    href="tel:14434"
                     style={{
-                      backgroundColor: '#f1f5f9',
-                      color: '#334155',
+                      backgroundColor: '#f8fafc',
+                      color: '#1e293b',
                       border: '1px solid #cbd5e1',
                       borderRadius: '10px',
-                      padding: '10px 16px',
+                      padding: '11px 18px',
+                      fontSize: '13.5px',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'background-color 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f8fafc')}
+                  >
+                    <PhoneCall size={15} color="#0d7e48" />
+                    <span>कॉल लेबर हेल्पलाइन 14434</span>
+                  </a>
+                </div>
+
+                {/* Secondary Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={handleStartVoiceInteraction}
+                    style={{
+                      backgroundColor: '#f1f5f9',
+                      color: '#475569',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '10px',
+                      padding: '11px 16px',
                       fontSize: '13px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -616,43 +1035,33 @@ export function AiVoiceAssistantBanner({ onOpenGrievance, onOpenSchemes, onOpenE
                       alignItems: 'center',
                       gap: '6px'
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e2e8f0')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
                   >
                     <RotateCcw size={14} />
-                    <span>Ask Another</span>
+                    <span>पुनः प्रश्न पूछें (Ask Again)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    style={{
+                      backgroundColor: '#0f172a',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '11px 18px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Back to Dashboard
                   </button>
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Bottom Switcher: Tap Sample Queries */}
-          <div style={{ width: '100%', maxWidth: '640px' }}>
-            <div style={{ fontSize: '12px', color: '#94a3b8', textAlign: 'center', marginBottom: '10px' }}>
-              Or tap any sample question to test:
             </div>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              {demoQueries.map((q, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleResetListening(q)}
-                  style={{
-                    backgroundColor: activeQuery === q.text ? '#0d7e48' : 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    fontSize: '12px',
-                    color: '#ffffff',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  🎙️ {q.text.length > 38 ? q.text.substring(0, 38) + '...' : q.text}
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       )}
     </>
