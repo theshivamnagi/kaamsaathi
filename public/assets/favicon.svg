@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <rect width="48" height="48" rx="12" fill="#0a0a0a"/>
+  <!-- Friendly stylized Indian worker cap / shield / spark icon -->
+  <circle cx="24" cy="24" r="16" fill="#ffb084" />
+  <path d="M14 26 C14 20, 34 20, 34 26 C34 32, 14 32, 14 26 Z" fill="#ff4d8b" />
+  <circle cx="24" cy="18" r="5" fill="#1a3a3a" />
+  <circle cx="24" cy="24" r="2.5" fill="#fffaf0" />
+</svg>
