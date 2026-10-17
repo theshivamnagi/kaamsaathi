@@ -1,15 +1,33 @@
 import React, { useState } from 'react'
-import { LanguageProvider } from '../hooks/useLanguage'
+import { LanguageProvider, useLanguage } from '../hooks/useLanguage'
 import { Navbar } from '../components/navigation/Navbar'
 import { MobileBottomNav } from '../components/navigation/MobileBottomNav'
 import { Footer } from '../components/layout/Footer'
 import { LandingPage } from '../pages/LandingPage'
 import { DashboardPage } from '../pages/DashboardPage'
+import { SplashScreen } from '../components/common/SplashScreen'
+import { LanguageModal } from '../components/common/LanguageModal'
 
 export function AppContent() {
+  const { lang, setLang } = useLanguage()
+
+  // Onboarding Animation & Language Selection Flow
+  const [showSplash, setShowSplash] = useState(true)
+  const [showLangModal, setShowLangModal] = useState(false)
+
   // 'landing' | 'dashboard'
   const [currentPage, setCurrentPage] = useState('landing')
   const [dashboardTab, setDashboardTab] = useState('home')
+
+  const handleSplashFinish = () => {
+    setShowSplash(false)
+    setShowLangModal(true)
+  }
+
+  const handleSelectLanguage = (selectedLang) => {
+    setLang(selectedLang)
+    setShowLangModal(false)
+  }
 
   // Handle navigation requests from anywhere in the app
   const handleNavigate = (page, targetTabOrSection) => {
@@ -49,6 +67,16 @@ export function AppContent() {
         backgroundColor: currentPage === 'dashboard' ? '#f8fafc' : 'var(--colors-canvas)'
       }}
     >
+      {/* 1. Animated Logo Splash Screen (Shows before landing page) */}
+      {showSplash && <SplashScreen onFinish={handleSplashFinish} durationMs={2200} />}
+
+      {/* 2. Regional Language vs English Pop-up (Hindi pre-selected by default) */}
+      <LanguageModal
+        isOpen={showLangModal}
+        initialLang={lang || 'hi'}
+        onSelectLanguage={handleSelectLanguage}
+      />
+
       {/* Sticky Top Navigation for Public Landing Page only */}
       {currentPage === 'landing' && (
         <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
@@ -67,7 +95,7 @@ export function AppContent() {
         )}
       </main>
 
-      {/* Footer for Public Landing Page only (Dashboard sidebar has its own footer links) */}
+      {/* Footer for Public Landing Page only */}
       {currentPage === 'landing' && (
         <Footer onNavigate={handleNavigate} />
       )}

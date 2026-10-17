@@ -4,7 +4,8 @@ import { translations } from '../data/translations'
 const LanguageContext = createContext()
 
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState('en')
+  // Default regional language to Hindi ('hi') per user instruction
+  const [lang, setLang] = useState('hi')
 
   // Load preferred language from localStorage if available
   useEffect(() => {
