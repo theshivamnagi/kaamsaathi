@@ -4,7 +4,7 @@ import { useLanguage } from '../hooks/useLanguage'
 // UMANG Dashboard Components
 import { UmangHeader } from '../components/dashboard/UmangHeader'
 import { UmangSidebar } from '../components/dashboard/UmangSidebar'
-import { HeroBannerCarousel } from '../components/dashboard/HeroBannerCarousel'
+import { AiVoiceAssistantBanner } from '../components/dashboard/AiVoiceAssistantBanner'
 import { DigiPinBanner } from '../components/dashboard/DigiPinBanner'
 import { QuickServices } from '../components/dashboard/QuickServices'
 import { FloatingChatbot } from '../components/dashboard/FloatingChatbot'
@@ -232,8 +232,13 @@ export function DashboardPage({ initialTab = 'home', onNavigateLanding }) {
              ========================================================= */}
           {activeTab === 'home' && (
             <div>
-              {/* 1. Hero Carousel Banner (MANAS / Gig welfare) */}
-              <HeroBannerCarousel onAccessNow={handleAccessNow} />
+              {/* 1. Hero AI Voice Assistant Banner (Replaced carousel with Google-Search-style AI voice assistant) */}
+              <AiVoiceAssistantBanner
+                onOpenGrievance={() => setActiveTab('grievance')}
+                onOpenSchemes={() => setActiveTab('schemes')}
+                onOpenEarnings={() => setActiveTab('earnings')}
+                onOpenDigiPin={() => setShowDigiPinModal(true)}
+              />
 
               {/* 2. "Know Your DigiPin" Bar */}
               <DigiPinBanner onOpenDigiPin={() => setShowDigiPinModal(true)} />
