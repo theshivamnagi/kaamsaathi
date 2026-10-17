@@ -1,8 +1,5 @@
 import React, { useState } from 'react'
 import { welfareSchemesData } from '../../data/schemes'
-import { FeatureCard, ContentCard } from '../../components/common/Card'
-import { Badge } from '../../components/common/Badge'
-import { Button } from '../../components/common/Button'
 import { useLanguage } from '../../hooks/useLanguage'
 import { 
   HeartHandshake, 
@@ -12,178 +9,308 @@ import {
   Sparkles, 
   Info,
   CheckCircle2,
-  Filter
+  Filter,
+  Search,
+  ShieldPlus,
+  Landmark,
+  BadgeCheck,
+  ArrowRight,
+  ExternalLink
 } from 'lucide-react'
 
 export function WelfareSchemeFinder() {
   const { lang } = useLanguage()
   const [selectedSchemeId, setSelectedSchemeId] = useState(welfareSchemesData[0].id)
-  const [workerTypeFilter, setWorkerTypeFilter] = useState('all') // 'all' | 'delivery' | 'driver' | 'informal'
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+
+  const filteredSchemes = welfareSchemesData.filter(s => {
+    const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          s.benefitSummary.toLowerCase().includes(searchQuery.toLowerCase())
+    if (categoryFilter === 'all') return matchesSearch
+    return matchesSearch && s.category.toLowerCase().includes(categoryFilter.toLowerCase())
+  })
 
   const selectedScheme = welfareSchemesData.find(s => s.id === selectedSchemeId) || welfareSchemesData[0]
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-      {/* Header */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <Badge variant="teal" icon={HeartHandshake}>
-            {lang === 'hi' ? 'फीचर 4: कल्याणकारी योजना खोजक' : 'Feature 4: Welfare Scheme Discovery'}
-          </Badge>
-          <span className="caption" style={{ color: 'var(--colors-muted)' }}>
-            Fictional Demonstration Data
-          </span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+      {/* 1. Header with Search & Controls */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Government & Welfare Aid Schemes</span>
+            <HeartHandshake size={26} color="#0d7e48" />
+          </h1>
+          <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0 }}>
+            Central and State social security programs, accident insurance, and healthcare grants for gig workers.
+          </p>
         </div>
-        <h2 className="display-sm" style={{ marginBottom: '8px' }}>
-          {lang === 'hi' ? 'कामगार कल्याण एवं सुरक्षा योजनाएं (डेमो)' : 'Government & Welfare Aid Schemes (Demo)'}
-        </h2>
-        <p className="body-md">
-          {lang === 'hi'
-            ? 'दुर्घटना बीमा, परिवार स्वास्थ्य सहायता और टूल अनुदान की पात्रता एवं आवश्यक दस्तावेजों की सरल जानकारी।'
-            : 'Explore prototype welfare programs demonstrating how future versions could match informal workers with state and central social security nets.'}
-        </p>
+
+        {/* Search */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '9999px',
+              padding: '7px 14px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+            }}
+          >
+            <Search size={15} color="#94a3b8" />
+            <input
+              type="text"
+              placeholder="Search schemes & grants..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                border: 'none',
+                outline: 'none',
+                fontSize: '13px',
+                color: '#1e293b',
+                width: '180px',
+                backgroundColor: 'transparent'
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              backgroundColor: '#ecfdf5',
+              border: '1px solid #bbf7d0',
+              borderRadius: '9999px',
+              padding: '7px 14px',
+              fontSize: '12.5px',
+              fontWeight: 700,
+              color: '#0d7e48',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <BadgeCheck size={14} />
+            <span>e-Shram Linked</span>
+          </div>
+        </div>
       </div>
 
-      {/* Mandatory Hackathon Demonstration Callout Banner */}
-      <div
-        style={{
-          padding: '12px 16px',
-          borderRadius: 'var(--rounded-md)',
-          backgroundColor: '#fffbeb',
-          border: '1px solid #fef3c7',
-          color: '#92400e',
-          fontSize: '12px',
-          lineHeight: 1.5,
-          display: 'flex',
-          gap: '10px',
-          alignItems: 'center'
+      {/* 2. Top 4 Metric KPI Cards (Matching unified SaaS style) */}
+      <div 
+        style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', 
+          gap: '16px' 
         }}
       >
-        <Sparkles size={18} color="#b45309" style={{ flexShrink: 0 }} />
-        <div>
-          <strong>Fictional Demonstration Notice:</strong> The schemes shown below are realistic illustrative examples designed for hackathon evaluation. They do not represent official government gazettes, actual enrollment portals, or guaranteed financial disbursals.
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Landmark size={18} color="#0d7e48" />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Welfare Schemes</span>
+            </div>
+            <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+              <path d="M2 18 C 16 14, 28 8, 42 12 C 50 16, 56 6, 58 4" stroke="#0d7e48" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>8 Programs</div>
+            <span style={{ backgroundColor: '#dcfce7', color: '#15803d', fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '9999px' }}>
+              Active
+            </span>
+          </div>
+        </div>
+
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ShieldPlus size={18} color="#059669" />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Max Hospital Cover</span>
+            </div>
+            <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+              <path d="M2 20 C 14 16, 26 6, 40 10 C 48 14, 54 4, 58 2" stroke="#059669" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>₹5,00,000</div>
+            <span style={{ backgroundColor: '#dcfce7', color: '#15803d', fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '9999px' }}>
+              PM-JAY Cashless
+            </span>
+          </div>
+        </div>
+
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <BadgeCheck size={18} color="#0d7e48" />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Enrollment Cost</span>
+            </div>
+            <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+              <path d="M2 16 C 16 12, 28 20, 42 6 C 50 2, 56 8, 58 4" stroke="#0d7e48" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>100% Free</div>
+            <span style={{ backgroundColor: '#dcfce7', color: '#15803d', fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '9999px' }}>
+              Zero Fees
+            </span>
+          </div>
+        </div>
+
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Users size={18} color="#059669" />
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Enrolled Gig Workers</span>
+            </div>
+            <svg width="60" height="24" viewBox="0 0 60 24" fill="none">
+              <path d="M2 18 C 16 14, 28 4, 42 8 C 50 12, 56 2, 58 1" stroke="#059669" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>2.8 Lakh+</div>
+            <span style={{ backgroundColor: '#dcfce7', color: '#15803d', fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '9999px' }}>
+              ▲ Verified
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Scheme Cards Grid */}
-      <div className="grid-3">
-        {welfareSchemesData.map((scheme) => {
+      {/* 3. Schemes Grid */}
+      <div 
+        style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+          gap: '16px' 
+        }}
+      >
+        {filteredSchemes.map((scheme) => {
           const isSelected = selectedSchemeId === scheme.id
           return (
             <div
               key={scheme.id}
               onClick={() => setSelectedSchemeId(scheme.id)}
               style={{
+                backgroundColor: isSelected ? '#f0fdf4' : '#ffffff',
+                border: isSelected ? '2px solid #0d7e48' : '1px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: '20px',
                 cursor: 'pointer',
-                borderRadius: 'var(--rounded-xl)',
-                border: '2px solid',
-                borderColor: isSelected ? 'var(--colors-ink)' : 'transparent',
-                transition: 'all 0.15s ease'
+                boxShadow: isSelected ? '0 4px 14px rgba(13, 126, 72, 0.12)' : '0 1px 3px rgba(0,0,0,0.02)',
+                transition: 'all 0.15s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
               }}
             >
-              <FeatureCard color={scheme.cardColor.replace('feature-card-', '')} style={{ height: '100%' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                  <Badge variant="default" style={{ backgroundColor: '#ffffff', color: '#0a0a0a' }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#0d7e48', textTransform: 'uppercase' }}>
+                    {scheme.category}
+                  </span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '9999px', backgroundColor: '#ecfdf5', color: '#0d7e48' }}>
                     {scheme.badge}
-                  </Badge>
-                  {isSelected && <CheckCircle2 size={18} color="currentColor" />}
+                  </span>
                 </div>
 
-                <h3 className="title-md" style={{ marginBottom: '8px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
                   {scheme.name}
                 </h3>
 
-                <p style={{ fontSize: '13px', opacity: 0.9, marginBottom: '14px' }}>
+                <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: '0 0 14px 0' }}>
                   {scheme.benefitSummary}
                 </p>
+              </div>
 
-                <div style={{ fontSize: '12px', opacity: 0.85, borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '10px' }}>
-                  <strong>Target:</strong> {scheme.intendedAudience}
-                </div>
-              </FeatureCard>
+              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11.5px', color: '#64748b' }}>
+                <span>Audience: <strong>{scheme.intendedAudience}</strong></span>
+                <span style={{ color: '#0d7e48', fontWeight: 700 }}>Details →</span>
+              </div>
             </div>
           )
         })}
       </div>
 
-      {/* Detailed View for Selected Scheme */}
-      <ContentCard>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+      {/* 4. Selected Scheme Detail Box */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '20px',
+          padding: '28px',
+          border: '1.5px solid #86efac',
+          boxShadow: '0 4px 14px rgba(0,0,0,0.03)'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
           <div>
-            <span className="caption-uppercase" style={{ color: 'var(--colors-muted)' }}>
-              {selectedScheme.category}
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#0d7e48', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+              {selectedScheme.category} • Selected Program
             </span>
-            <h3 className="title-lg" style={{ marginTop: '4px' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', margin: '4px 0 6px 0' }}>
               {selectedScheme.name}
             </h3>
-            <p className="body-md" style={{ marginTop: '4px' }}>
-              <strong>{lang === 'hi' ? 'लक्षित लाभार्थी:' : 'Intended Beneficiaries:'}</strong> {selectedScheme.intendedAudience}
+            <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0 }}>
+              <strong>Target Audience:</strong> {selectedScheme.intendedAudience}
             </p>
           </div>
 
-          <Badge variant="teal">
-            {selectedScheme.badge}
-          </Badge>
+          <button
+            type="button"
+            onClick={() => alert(`Initiating DigiLocker pre-fill verification for ${selectedScheme.name}`)}
+            style={{
+              backgroundColor: '#0d7e48',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '11px 20px',
+              fontSize: '13.5px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 12px rgba(13, 126, 72, 0.25)'
+            }}
+          >
+            <span>Apply with DigiLocker</span>
+            <ArrowRight size={15} />
+          </button>
         </div>
 
-        <div className="grid-2" style={{ gap: '24px' }}>
-          {/* Eligibility checklist */}
-          <div style={{ backgroundColor: 'var(--colors-surface-card)', padding: '18px', borderRadius: 'var(--rounded-md)', border: '1px solid var(--colors-hairline)' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <CheckSquare size={16} color="#15803d" />
-              {lang === 'hi' ? 'पात्रता शर्तें (Eligibility Criteria):' : 'Eligibility Conditions:'}
+        {/* Benefits & Eligibility Details */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px', marginTop: '16px' }}>
+          <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <h4 style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Benefits Summary
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {selectedScheme.eligibility.map((cond, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px' }}>
-                  <span style={{ color: '#15803d', fontWeight: 700 }}>✓</span>
-                  <span>{cond}</span>
-                </div>
-              ))}
+            <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5, margin: 0 }}>
+              {selectedScheme.benefitSummary}
+            </p>
+          </div>
+
+          <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <h4 style={{ fontSize: '12.5px', fontWeight: 700, color: '#0f172a', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Required Documents
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12.5px', color: '#334155' }}>
+              <div>• Aadhaar Card linked to Mobile</div>
+              <div>• Active e-Shram UAN Card</div>
+              <div>• Bank Account with Direct Benefit Transfer (DBT)</div>
             </div>
           </div>
-
-          {/* Required Documents */}
-          <div style={{ backgroundColor: 'var(--colors-surface-card)', padding: '18px', borderRadius: 'var(--rounded-md)', border: '1px solid var(--colors-hairline)' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <FileText size={16} color="#0a0a0a" />
-              {lang === 'hi' ? 'आवश्यक दस्तावेज़ (Required Documents):' : 'Documents Needed:'}
-            </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {selectedScheme.requiredDocuments.map((doc, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px' }}>
-                  <span style={{ color: 'var(--colors-muted)', fontWeight: 600 }}>•</span>
-                  <span>{doc}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
-
-        {/* Application Process Steps */}
-        <div style={{ marginTop: '24px', borderTop: '1px solid var(--colors-hairline)', paddingTop: '20px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '12px' }}>
-            {lang === 'hi' ? 'आवेदन के चरण (Demonstration Process Steps):' : 'Application Process Walkthrough:'}
-          </h4>
-          <div className="grid-2" style={{ gap: '12px' }}>
-            {selectedScheme.applicationSteps.map((step, idx) => (
-              <div
-                key={idx}
-                style={{
-                  padding: '12px 14px',
-                  backgroundColor: 'var(--colors-canvas)',
-                  borderRadius: 'var(--rounded-md)',
-                  border: '1px solid var(--colors-hairline)',
-                  fontSize: '13px',
-                  lineHeight: 1.45
-                }}
-              >
-                {step}
-              </div>
-            ))}
-          </div>
-        </div>
-      </ContentCard>
+      </div>
     </div>
   )
 }
