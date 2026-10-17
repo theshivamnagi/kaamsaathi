@@ -1,377 +1,702 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from '../components/common/Button'
-import { FeatureCard, ContentCard } from '../components/common/Card'
 import { Badge } from '../components/common/Badge'
-import { DemoDisclaimer } from '../components/ui/DemoDisclaimer'
 import { useLanguage } from '../hooks/useLanguage'
 import { 
-  Calculator, 
-  ShieldCheck, 
-  HeartHandshake, 
-  FileEdit, 
-  ShieldAlert, 
-  FileText, 
   ArrowRight, 
+  Search, 
+  QrCode, 
+  Sparkles, 
   CheckCircle2, 
-  Sparkles,
-  PhoneCall,
-  LayoutDashboard,
-  Clock,
+  HelpCircle,
+  FileText,
+  Heart,
+  Briefcase,
+  GraduationCap,
+  Home,
+  Scale,
+  Cpu,
   TrendingUp,
-  AlertTriangle,
+  Users,
+  Truck,
+  Wrench,
+  Building2,
+  Wheat,
+  Smile,
+  ShieldCheck,
+  ClipboardList,
+  FolderSearch,
+  MousePointerClick,
   ChevronRight,
-  Compass
+  MessageSquare,
+  Calculator,
+  FileEdit,
+  ShieldAlert,
+  HeartHandshake,
+  FolderLock,
+  MapPin,
+  Award
 } from 'lucide-react'
 
 export function LandingPage({ onNavigate }) {
-  const { t, lang } = useLanguage()
+  const { lang } = useLanguage()
+  const [activeCategory, setActiveCategory] = useState(null)
+  const [botOpen, setBotOpen] = useState(false)
 
-  const features = [
+  // 8 Specific Gig Worker Support Categories aligned with KaamSaathi's mission
+  const categories = [
     {
       id: 'earnings',
-      title: lang === 'hi' ? 'कमाई एवं कटौती कैलकुलेटर' : 'Earnings & Deduction Tracker',
-      desc: lang === 'hi' 
-        ? 'पेट्रोल, बाइक सर्विसिंग और ऐप पेनाल्टी के बाद वास्तविक शुद्ध प्रति घंटा मजदूरी जानें।' 
-        : 'Compute real net hourly wages after petrol, bike servicing, and hidden platform fines.',
+      title: 'Net Earnings & Fuel Audit',
+      count: 'Instant Math',
+      desc: 'Deduct fuel, maintenance & platform commission cuts',
       icon: Calculator,
-      color: 'peach',
-      targetFeature: 'earnings',
-      badge: lang === 'hi' ? 'सटीक गणित' : 'Pure Math'
+      bg: '#eefcf5',
+      color: '#0d7e48',
+      target: 'earnings'
     },
     {
       id: 'grievance',
-      title: lang === 'hi' ? 'औपचारिक शिकायत ड्राफ्टर' : 'Grievance & Dispute Drafter',
-      desc: lang === 'hi'
-        ? 'रोके गए भुगतान या गलत पेनल्टी के विरुद्ध कंपनी सपोर्ट के लिए पेशेवर शिकायत पत्र बनाएं।'
-        : 'Generate formal, audit-ready dispute letters in English & Hindi ready to copy into support.',
+      title: 'Grievance & Dispute Drafter',
+      count: 'Audit-Ready Letters',
+      desc: 'Formal notices for withheld payouts and penalties',
       icon: FileEdit,
-      color: 'pink',
-      targetFeature: 'grievance',
-      badge: lang === 'hi' ? 'प्रमुख सुविधा' : 'Core Demo'
+      bg: '#fdf2f8',
+      color: '#db2777',
+      target: 'grievance'
     },
     {
       id: 'rights',
-      title: lang === 'hi' ? 'कामगार अधिकार मार्गदर्शिका' : 'Worker Rights & Fair Pay',
-      desc: lang === 'hi'
-        ? 'खाता बंद होने, देर से भुगतान या गायब ट्रिप रिकॉर्ड्स पर अपने कानूनी विकल्प समझें।'
-        : 'Know your statutory protections against arbitrary bans, payment delays, and ghost trips.',
+      title: 'Worker Rights & Protections',
+      count: 'Social Security Code',
+      desc: 'Working hour limits, deactivation protection & rights',
       icon: ShieldCheck,
-      color: 'lavender',
-      targetFeature: 'rights',
-      badge: lang === 'hi' ? 'जागरूकता' : 'Protection'
-    },
-    {
-      id: 'schemes',
-      title: lang === 'hi' ? 'कल्याणकारी योजना खोजक' : 'Welfare Scheme Finder (Demo)',
-      desc: lang === 'hi'
-        ? 'दुर्घटना बीमा, ई-श्रम और परिवार स्वास्थ्य सहायता योजनाओं की पात्रता आसानी से जांचें।'
-        : 'Explore demo social security schemes, accident covers, and family health grants.',
-      icon: HeartHandshake,
-      color: 'teal',
-      targetFeature: 'schemes',
-      badge: lang === 'hi' ? 'डेमो योजनाएं' : 'Social Security'
+      bg: '#eff6ff',
+      color: '#2563eb',
+      target: 'rights'
     },
     {
       id: 'safety',
-      title: lang === 'hi' ? 'सड़क एवं कार्यस्थल सुरक्षा' : 'On-Duty Safety Guidance',
-      desc: lang === 'hi'
-        ? 'भीषण गर्मी, बारिश, दुर्घटना और ग्राहक विवादों के समय व्यावहारिक दिशा-निर्देश।'
-        : 'Crucial on-road protocols for heatwaves, floods, emergency numbers, and accidents.',
+      title: 'Road Safety & Emergency SOS',
+      count: '112/1075 Helplines',
+      desc: 'Night delivery protocols, weather alert & accident response',
       icon: ShieldAlert,
-      color: 'mint',
-      targetFeature: 'safety',
-      badge: lang === 'hi' ? 'आपातकालीन' : 'Life Safety'
+      bg: '#fff1f2',
+      color: '#e11d48',
+      target: 'safety'
+    },
+    {
+      id: 'schemes',
+      title: 'e-Shram & Welfare Schemes',
+      count: '₹2L Accidental + PM-JAY',
+      desc: 'Ayushman Bharat, pension & state welfare funds',
+      icon: HeartHandshake,
+      bg: '#f0fdfa',
+      color: '#0d9488',
+      target: 'schemes'
     },
     {
       id: 'docs',
-      title: lang === 'hi' ? 'दस्तावेज़ एवं पे-स्लिप गाइड' : 'Document Assistance',
-      desc: lang === 'hi'
-        ? 'जटिल पे-स्लिप कोड, बैंक केवाईसी और प्लेटफॉर्म नोटिस को सरल भाषा में समझें।'
-        : 'Demystify confusing deduction codes, Aadhaar KYC, and platform warning notices.',
-      icon: FileText,
-      color: 'cream',
-      targetFeature: 'docs',
-      badge: lang === 'hi' ? 'सरल भाषा' : 'Checklists'
+      title: 'DigiLocker Document Vault',
+      count: 'Digital Identity Pass',
+      desc: 'Store verified driving licenses, RC & e-Shram cards',
+      icon: FolderLock,
+      bg: '#fefce8',
+      color: '#ca8a04',
+      target: 'docs'
+    },
+    {
+      id: 'digipin',
+      title: 'National DigiPin Navigation',
+      count: '4m x 4m Precision',
+      desc: 'Department of Posts verified delivery doorstep codes',
+      icon: MapPin,
+      bg: '#f0fdf4',
+      color: '#16a34a',
+      target: 'home'
+    },
+    {
+      id: 'punjab',
+      title: 'Punjab Gig Workers Board',
+      count: 'Statutory Protections',
+      desc: '1-2% aggregator cess tracking & 90-day dispute redressal',
+      icon: Award,
+      bg: '#fff7ed',
+      color: '#ea580c',
+      target: 'punjab'
     }
   ]
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '80px' }}>
-      {/* 1. Hero Section (7-5 Split on Desktop per Clay spec) */}
-      <section className="container" style={{ paddingTop: '40px' }}>
-        <div style={{ marginBottom: '20px' }}>
-          <DemoDisclaimer />
-        </div>
+    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', position: 'relative' }}>
+      {/* =========================================================================
+          SECTION 1: HERO BANNER
+         ========================================================================= */}
+      <section 
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'radial-gradient(ellipse 90% 80% at 80% 30%, #ffedd5 0%, #f0fdf4 45%, #ffffff 85%)',
+          borderBottom: '1px solid #f1f5f9',
+          paddingTop: '36px',
+          paddingBottom: '54px'
+        }}
+      >
+        <div className="container">
+          <div className="grid-2" style={{ alignItems: 'center', gap: '32px' }}>
+            {/* Left Column: Headlines & CTA */}
+            <div style={{ zIndex: 2 }}>
+              {/* Brand heading */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '42px', fontWeight: 900, color: '#0d7e48', letterSpacing: '-1px', fontFamily: 'Inter, sans-serif' }}>
+                  kaamSaathi
+                </span>
+              </div>
+              <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', color: '#64748b', textTransform: 'uppercase', marginBottom: '20px' }}>
+                THE SPIRIT OF NEW INDIA • GIG WORKER ASSISTANT
+              </div>
 
-        <div className="grid-2" style={{ alignItems: 'center', gap: '48px' }}>
-          {/* Left Column: Headline & Action CTAs */}
-          <div>
-            <div style={{ marginBottom: '16px' }}>
-              <Badge variant="ochre" icon={Sparkles}>
-                {t.heroTag}
-              </Badge>
+              {/* Bold Title */}
+              <h1 style={{ fontSize: 'clamp(34px, 5vw, 54px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: '-1.5px', marginBottom: '16px' }}>
+                <span style={{ color: '#1e40af', display: 'block' }}>One Platform,</span>
+                <span style={{ color: '#ea580c', display: 'block' }}>Endless Opportunities</span>
+              </h1>
+
+              {/* Subtitle */}
+              <p style={{ fontSize: '16px', color: '#334155', lineHeight: 1.6, maxWidth: '520px', marginBottom: '28px' }}>
+                Empowering India's delivery partners, drivers, and informal workers with transparent earnings, rights protection, and formal dispute drafting.
+              </p>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap', marginBottom: '32px' }}>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('dashboard')}
+                  style={{
+                    backgroundColor: '#ea580c',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '14px 28px',
+                    fontSize: '17px',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    cursor: 'pointer',
+                    boxShadow: '0 8px 20px rgba(234, 88, 12, 0.3)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#c2410c')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ea580c')}
+                >
+                  <span>Open Worker Dashboard</span>
+                  <div style={{ backgroundColor: '#ffffff', color: '#ea580c', width: '28px', height: '28px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <ArrowRight size={18} />
+                  </div>
+                </button>
+
+                {/* Secondary Button */}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('dashboard', 'earnings')}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: '#0f172a',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '12px',
+                    padding: '13px 22px',
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#0d7e48')}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#cbd5e1')}
+                >
+                  Track Earnings & Cuts
+                </button>
+              </div>
+
+              {/* QR Code and Mobile Callout */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div 
+                  style={{ 
+                    backgroundColor: '#ffffff', 
+                    padding: '8px', 
+                    borderRadius: '12px', 
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                    border: '1px solid #e2e8f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <QrCode size={36} color="#0f172a" />
+                </div>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>
+                    Scan the QR Code
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>
+                    Access instantly on any Android or iPhone
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <h1 className="display-lg" style={{ marginBottom: '20px' }}>
-              {t.heroHeading}
-            </h1>
-
-            <p className="body-md" style={{ fontSize: '17px', lineHeight: 1.6, marginBottom: '32px', color: 'var(--colors-body-strong)' }}>
-              {t.heroDesc}
-            </p>
-
-            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-              <Button
-                variant="primary"
-                size="lg"
-                icon={LayoutDashboard}
-                onClick={() => onNavigate('dashboard')}
-              >
-                {t.ctaTryDashboard}
-              </Button>
-
-              <Button
-                variant="secondary"
-                size="lg"
-                icon={ArrowRight}
-                iconPosition="right"
-                onClick={() => {
-                  const el = document.getElementById('features-section')
-                  if (el) el.scrollIntoView({ behavior: 'smooth' })
+            {/* Right Column: Worker Illustration with Phone App */}
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+              {/* Main Worker Hero Image Frame */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '460px',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
+                  border: '4px solid #ffffff'
                 }}
               >
-                {t.ctaWatchDemo}
-              </Button>
-            </div>
+                <img 
+                  src="/assets/worker_hero.jpg" 
+                  alt="Young Indian Delivery Worker with KaamSaathi App" 
+                  style={{ width: '100%', height: 'auto', display: 'block' }} 
+                />
 
-            {/* Quick trust metrics */}
-            <div style={{ display: 'flex', gap: '24px', marginTop: '36px', borderTop: '1px solid var(--colors-hairline)', paddingTop: '20px' }}>
-              <div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--colors-ink)' }}>100%</div>
-                <div style={{ fontSize: '12px', color: 'var(--colors-muted)' }}>Offline / Local Math</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--colors-ink)' }}>6 Core</div>
-                <div style={{ fontSize: '12px', color: 'var(--colors-muted)' }}>Worker Features</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--colors-ink)' }}>Bilingual</div>
-                <div style={{ fontSize: '12px', color: 'var(--colors-muted)' }}>English & हिन्दी</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Hero Interactive Preview Card */}
-          <div>
-            <FeatureCard color="peach" style={{ position: 'relative' }}>
-              {/* Card top badge */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <span className="badge-pill" style={{ backgroundColor: '#ffffff', color: '#0a0a0a' }}>
-                  Live Worker Dashboard Preview
-                </span>
-                <span style={{ fontSize: '12px', fontWeight: 600 }}>Ramesh Kumar (Delhi)</span>
-              </div>
-
-              {/* Sample simulated stats */}
-              <div style={{ backgroundColor: '#ffffff', borderRadius: 'var(--rounded-lg)', padding: '18px', marginBottom: '16px', boxShadow: 'var(--shadow-subtle)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                {/* Overlay live chip */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '16px',
+                    left: '16px',
+                    right: '16px',
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '12px 16px',
+                    borderRadius: '14px',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                >
                   <div>
-                    <div style={{ fontSize: '11px', color: 'var(--colors-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
-                      Weekly Settlement Shortfall
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>
+                      Settlement Protected
                     </div>
-                    <div style={{ fontSize: '26px', fontWeight: 700, color: '#b91c1c' }}>
-                      ₹1,850 Pending
+                    <div style={{ fontSize: '15px', fontWeight: 700, color: '#0d7e48' }}>
+                      ₹1,850 Payout Dispute Resolved
                     </div>
                   </div>
-                  <Badge variant="warning">Discrepancy</Badge>
-                </div>
-
-                <div style={{ fontSize: '12px', color: 'var(--colors-body)', lineHeight: 1.45, backgroundColor: 'var(--colors-surface-card)', padding: '10px 12px', borderRadius: 'var(--rounded-sm)', marginBottom: '12px' }}>
-                  ⚡ <strong>Dispute detected:</strong> 4 cancelled trips marked as partner fault during waterlogged rain shift.
-                </div>
-
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    fullWidth
-                    icon={FileEdit}
-                    onClick={() => onNavigate('dashboard', 'grievance')}
-                  >
-                    Draft Dispute Letter
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    icon={Calculator}
-                    onClick={() => onNavigate('dashboard', 'earnings')}
-                  >
-                    Calculate
-                  </Button>
+                  <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#dcfce7', color: '#166534', padding: '4px 8px', borderRadius: '6px' }}>
+                    100% Local
+                  </span>
                 </div>
               </div>
-
-              {/* Secondary micro features preview row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div style={{ backgroundColor: 'rgba(255,255,255,0.6)', padding: '10px 12px', borderRadius: 'var(--rounded-sm)', fontSize: '12px' }}>
-                  <strong>Safety SOS:</strong> Quick 112 & road trauma helplines
-                </div>
-                <div style={{ backgroundColor: 'rgba(255,255,255,0.6)', padding: '10px 12px', borderRadius: 'var(--rounded-sm)', fontSize: '12px' }}>
-                  <strong>Rights Q&A:</strong> Algorithm penalty escalation steps
-                </div>
-              </div>
-            </FeatureCard>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Feature Overview (All 6 Features in Saturated Cards Palette) */}
-      <section id="features-section" className="container">
-        <div style={{ textAlign: 'center', maxWidth: '680px', margin: '0 auto 48px' }}>
-          <Badge variant="teal" icon={Sparkles} style={{ marginBottom: '12px' }}>
-            {lang === 'hi' ? '6 प्रमुख सुविधाएं' : 'Complete Support Suite'}
-          </Badge>
-          <h2 className="display-md" style={{ marginBottom: '14px' }}>
-            {t.featuresTitle}
-          </h2>
-          <p className="body-md">
-            {t.featuresSub}
-          </p>
-        </div>
+      {/* Hashtag Bar */}
+      <div 
+        style={{ 
+          backgroundColor: '#ffffff', 
+          borderBottom: '1px solid #e2e8f0', 
+          padding: '14px 0', 
+          textAlign: 'center',
+          fontSize: '13px',
+          fontWeight: 700,
+          color: '#334155',
+          letterSpacing: '0.8px'
+        }}
+      >
+        #KAAMSAATHI &nbsp;•&nbsp; #GIGWORKERSRIGHTS &nbsp;•&nbsp; #TRANSPARENTEARNINGS &nbsp;•&nbsp; #STATUTORYDISPUTES &nbsp;•&nbsp; #ESHRAMSOCIALSECURITY
+      </div>
 
-        <div className="grid-3">
-          {features.map((f) => {
-            const Icon = f.icon
-            return (
-              <div
-                key={f.id}
-                onClick={() => onNavigate('dashboard', f.targetFeature)}
-                style={{ cursor: 'pointer', height: '100%' }}
-              >
-                <FeatureCard color={f.color} style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                      <div
-                        style={{
-                          width: '42px',
-                          height: '42px',
-                          borderRadius: 'var(--rounded-md)',
-                          backgroundColor: 'rgba(255,255,255,0.3)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <Icon size={22} color="currentColor" />
-                      </div>
-                      <span className="badge-pill" style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: 'inherit' }}>
-                        {f.badge}
-                      </span>
-                    </div>
-
-                    <h3 className="title-md" style={{ marginBottom: '8px' }}>
-                      {f.title}
-                    </h3>
-
-                    <p style={{ fontSize: '14px', lineHeight: 1.5, opacity: 0.9 }}>
-                      {f.desc}
-                    </p>
-                  </div>
-
-                  <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600 }}>
-                    <span>{lang === 'hi' ? 'सुविधा खोलें' : 'Open Feature'}</span>
-                    <ChevronRight size={16} />
-                  </div>
-                </FeatureCard>
-              </div>
-            )
-          })}
-        </div>
-      </section>
-
-      {/* 3. How It Works (Simple 3-Step Section) */}
-      <section id="how-it-works-section" className="container">
-        <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 48px' }}>
-          <h2 className="display-md" style={{ marginBottom: '12px' }}>
-            {t.howItWorksTitle}
-          </h2>
-          <p className="body-md">
-            {t.howItWorksSub}
-          </p>
-        </div>
-
-        <div className="grid-3">
-          <ContentCard>
-            <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--colors-brand-pink)', marginBottom: '12px' }}>
-              01
-            </div>
-            <h3 className="title-md" style={{ marginBottom: '8px' }}>
-              {t.step1Title}
-            </h3>
-            <p className="body-sm" style={{ fontSize: '14px' }}>
-              {t.step1Desc}
+      {/* =========================================================================
+          SECTION 2: GIG WORKER ASSISTANCE CATEGORIES
+         ========================================================================= */}
+      <section style={{ padding: '64px 0 48px', backgroundColor: '#ffffff' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '44px' }}>
+            <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: '8px' }}>
+              Gig Worker Support & Protection Categories
+            </h2>
+            <p style={{ fontSize: '15px', color: '#64748b', maxWidth: '680px', margin: '0 auto' }}>
+              Auditing tools, dispute letter templates, safety protocols, and statutory welfare benefits designed specifically for frontline delivery partners and drivers.
             </p>
-          </ContentCard>
+          </div>
 
-          <ContentCard>
-            <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--colors-brand-teal)', marginBottom: '12px' }}>
-              02
-            </div>
-            <h3 className="title-md" style={{ marginBottom: '8px' }}>
-              {t.step2Title}
-            </h3>
-            <p className="body-sm" style={{ fontSize: '14px' }}>
-              {t.step2Desc}
-            </p>
-          </ContentCard>
-
-          <ContentCard>
-            <div style={{ fontSize: '32px', fontWeight: 800, color: '#e8b94a', marginBottom: '12px' }}>
-              03
-            </div>
-            <h3 className="title-md" style={{ marginBottom: '8px' }}>
-              {t.step3Title}
-            </h3>
-            <p className="body-sm" style={{ fontSize: '14px' }}>
-              {t.step3Desc}
-            </p>
-          </ContentCard>
-        </div>
-      </section>
-
-      {/* 4. Pre-Footer Closing CTA Band (Clay spec: surface-soft cream) */}
-      <section className="container">
-        <div
-          style={{
-            backgroundColor: 'var(--colors-surface-soft)',
-            borderRadius: 'var(--rounded-xl)',
-            padding: '56px 40px',
-            textAlign: 'center',
-            border: '1px solid var(--colors-hairline)'
-          }}
-        >
-          <Badge variant="teal" style={{ marginBottom: '16px' }}>
-            {lang === 'hi' ? 'तुरंत शुरुआत करें' : 'Try the Live Prototype'}
-          </Badge>
-          <h2 className="display-md" style={{ marginBottom: '14px' }}>
-            {lang === 'hi' ? 'अपने काम और कमाई को आसान बनाएं' : 'Take Control of Your Gig Earnings & Rights Today'}
-          </h2>
-          <p className="body-md" style={{ maxWidth: '580px', margin: '0 auto 28px' }}>
-            {lang === 'hi'
-              ? 'बिना किसी पंजीकरण या ऐप डाउनलोड के, सीधे ब्राउज़र में कामगार डैशबोर्ड का अनुभव करें।'
-              : 'Experience the full worker journey: identify payout deductions, calculate true earnings, and copy a complaint draft in under 2 minutes.'}
-          </p>
-
-          <Button
-            variant="primary"
-            size="lg"
-            icon={LayoutDashboard}
-            onClick={() => onNavigate('dashboard')}
+          {/* Grid of Categories */}
+          <div 
+            style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
+              gap: '20px' 
+            }}
           >
-            {t.ctaTryDashboard}
-          </Button>
+            {categories.map((cat) => {
+              const Icon = cat.icon
+              return (
+                <div
+                  key={cat.id}
+                  onClick={() => onNavigate('dashboard', cat.target)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    cursor: 'pointer',
+                    padding: '20px',
+                    borderRadius: '16px',
+                    transition: 'all 0.2s ease',
+                    border: '1px solid #e2e8f0',
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8fafc'
+                    e.currentTarget.style.borderColor = cat.color
+                    e.currentTarget.style.transform = 'translateY(-3px)'
+                    e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.06)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ffffff'
+                    e.currentTarget.style.borderColor = '#e2e8f0'
+                    e.currentTarget.style.transform = 'none'
+                    e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '14px' }}>
+                    <div
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '12px',
+                        backgroundColor: cat.bg,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: cat.color
+                      }}
+                    >
+                      <Icon size={24} />
+                    </div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: cat.color, backgroundColor: cat.bg, padding: '3px 8px', borderRadius: '6px' }}>
+                      {cat.count}
+                    </span>
+                  </div>
+
+                  <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
+                    {cat.title}
+                  </h3>
+                  <p style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.45, margin: 0 }}>
+                    {cat.desc}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Launch Dashboard Button */}
+          <div style={{ textAlign: 'center', marginTop: '36px' }}>
+            <button
+              type="button"
+              onClick={() => onNavigate('dashboard')}
+              style={{
+                backgroundColor: 'transparent',
+                color: '#0d7e48',
+                border: '1.5px solid #0d7e48',
+                borderRadius: '8px',
+                padding: '10px 24px',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#ecfdf5'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
+            >
+              <span>Explore All Features on Dashboard</span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
         </div>
       </section>
+
+      {/* =========================================================================
+          SECTION 3: HOW IT WORKS
+         ========================================================================= */}
+      <section 
+        style={{ 
+          padding: '72px 0', 
+          backgroundColor: '#f8fafc',
+          backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+          borderTop: '1px solid #e2e8f0',
+          borderBottom: '1px solid #e2e8f0'
+        }}
+      >
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#0d7e48', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>
+              How it works
+            </div>
+            <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>
+              3 Simple Steps to Audit Earnings & Claim Protections
+            </h2>
+          </div>
+
+          {/* 3 Step Cards */}
+          <div 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              flexWrap: 'wrap', 
+              gap: '24px' 
+            }}
+          >
+            {/* Step 1: Log Payout & Outflow */}
+            <div 
+              style={{ 
+                backgroundColor: '#ffffff', 
+                borderRadius: '16px', 
+                padding: '36px 28px', 
+                width: '100%', 
+                maxWidth: '320px', 
+                textAlign: 'center',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                border: '1px solid #f1f5f9'
+              }}
+            >
+              <div 
+                style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  borderRadius: '12px', 
+                  backgroundColor: '#ecfdf5', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: '0 auto 18px',
+                  color: '#0d7e48'
+                }}
+              >
+                <Calculator size={32} />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                1. Calculate Real Net Pay
+              </h3>
+              <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
+                Enter gross weekly payouts, fuel costs, and maintenance to uncover <strong>true net take-home earnings</strong>.
+              </p>
+            </div>
+
+            {/* Connecting Chevron */}
+            <div className="desktop-only" style={{ color: '#cbd5e1' }}>
+              <ChevronRight size={36} strokeWidth={2.5} />
+            </div>
+
+            {/* Step 2: Audit & Detect Violations */}
+            <div 
+              style={{ 
+                backgroundColor: '#ffffff', 
+                borderRadius: '16px', 
+                padding: '36px 28px', 
+                width: '100%', 
+                maxWidth: '320px', 
+                textAlign: 'center',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                border: '1px solid #f1f5f9'
+              }}
+            >
+              <div 
+                style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  borderRadius: '12px', 
+                  backgroundColor: '#eff6ff', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: '0 auto 18px',
+                  color: '#1d4ed8'
+                }}
+              >
+                <Scale size={32} />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                2. Audit Deductions & Law
+              </h3>
+              <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
+                Automated detection flags <strong>unexpected deduction cuts</strong> and violations against statutory Social Security rules.
+              </p>
+            </div>
+
+            {/* Connecting Chevron */}
+            <div className="desktop-only" style={{ color: '#cbd5e1' }}>
+              <ChevronRight size={36} strokeWidth={2.5} />
+            </div>
+
+            {/* Step 3: Draft Dispute Letter or Claim Benefit */}
+            <div 
+              style={{ 
+                backgroundColor: '#ffffff', 
+                borderRadius: '16px', 
+                padding: '36px 28px', 
+                width: '100%', 
+                maxWidth: '320px', 
+                textAlign: 'center',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                border: '1px solid #f1f5f9'
+              }}
+            >
+              <div 
+                style={{ 
+                  width: '64px', 
+                  height: '64px', 
+                  borderRadius: '12px', 
+                  backgroundColor: '#fdf2f8', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  margin: '0 auto 18px',
+                  color: '#db2777'
+                }}
+              >
+                <FileEdit size={32} />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                3. Draft Notice or Claim Aid
+              </h3>
+              <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
+                Generate an <strong>audit-ready legal dispute letter</strong> to the company or claim eligible government accident covers.
+              </p>
+            </div>
+          </div>
+
+          {/* Quick CTA to try dashboard */}
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <button
+              type="button"
+              onClick={() => onNavigate('dashboard')}
+              style={{
+                backgroundColor: '#0d7e48',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '12px 28px',
+                fontSize: '15px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 14px rgba(13, 126, 72, 0.25)',
+                transition: 'background-color 0.15s ease'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#15803d')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0d7e48')}
+            >
+              <span>Try Interactive Steps on Dashboard</span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          FLOATING CHATBOT WIDGET
+         ========================================================================= */}
+      <div 
+        style={{ 
+          position: 'fixed', 
+          bottom: '24px', 
+          right: '24px', 
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: '10px'
+        }}
+      >
+        {botOpen && (
+          <div
+            style={{
+              width: '320px',
+              backgroundColor: '#ffffff',
+              borderRadius: '16px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.18)',
+              border: '1px solid #e2e8f0',
+              overflow: 'hidden',
+              animation: 'fadeIn 0.2s ease'
+            }}
+          >
+            <div style={{ backgroundColor: '#0d7e48', color: '#ffffff', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '18px' }}>🤖</span>
+                <span style={{ fontWeight: 700, fontSize: '14px' }}>KaamSaathi AI Sahayak</span>
+              </div>
+              <button onClick={() => setBotOpen(false)} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '16px' }}>✕</button>
+            </div>
+            <div style={{ padding: '16px', fontSize: '13px', color: '#334155', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div>नमस्ते! मैं कामसाथी सहायक बोट हूँ। आप क्या करना चाहते हैं?</div>
+              <button 
+                onClick={() => { setBotOpen(false); onNavigate('dashboard', 'earnings'); }}
+                style={{ textAlign: 'left', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer', fontSize: '12px' }}
+              >
+                💰 मेरी कमाई व पेट्रोल कटौती जांचें
+              </button>
+              <button 
+                onClick={() => { setBotOpen(false); onNavigate('dashboard', 'grievance'); }}
+                style={{ textAlign: 'left', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer', fontSize: '12px' }}
+              >
+                📝 कंपनी सपोर्ट के लिए शिकायत पत्र ड्राफ्ट करें
+              </button>
+              <button 
+                onClick={() => { setBotOpen(false); onNavigate('dashboard', 'schemes'); }}
+                style={{ textAlign: 'left', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer', fontSize: '12px' }}
+              >
+                🏛️ सरकारी कल्याणकारी योजनाएं खोजें
+              </button>
+            </div>
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setBotOpen(!botOpen)}
+          title="Ask KaamSaathi AI"
+          style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            backgroundColor: '#0d7e48',
+            color: '#ffffff',
+            border: '3px solid #ffffff',
+            boxShadow: '0 6px 18px rgba(13, 126, 72, 0.4)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'transform 0.15s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.08)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
+        >
+          <span style={{ fontSize: '26px' }}>🤖</span>
+        </button>
+      </div>
     </div>
   )
 }

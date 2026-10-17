@@ -1,145 +1,223 @@
 import React from 'react'
-import { ShieldCheck, Heart, Sparkles, PhoneCall } from 'lucide-react'
+import { ShieldCheck, ArrowRight, ExternalLink, Heart, Phone, HelpCircle } from 'lucide-react'
 import { useLanguage } from '../../hooks/useLanguage'
 
 export function Footer({ onNavigate }) {
   const { lang } = useLanguage()
 
   return (
-    <footer className="footer">
-      <div className="container">
-        <div className="grid-3" style={{ marginBottom: '40px' }}>
+    <footer style={{ backgroundColor: '#0f172a', color: '#cbd5e1', borderTop: '3px solid #0d7e48', marginTop: '60px' }}>
+      <div className="container" style={{ paddingTop: '48px', paddingBottom: '36px' }}>
+        {/* Main 4-column Grid */}
+        <div 
+          style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+            gap: '36px',
+            marginBottom: '40px' 
+          }}
+        >
           {/* Col 1: Brand & Mission */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-              <div
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: 'var(--rounded-md)',
-                  backgroundColor: 'var(--colors-primary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff'
-                }}
-              >
-                <ShieldCheck size={18} color="#ffb084" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+              <img 
+                src="/assets/emblem.svg" 
+                alt="Government of India Emblem" 
+                style={{ height: '32px', width: 'auto', filter: 'brightness(0) invert(1)' }} 
+              />
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.5px' }}>
+                  kaam
+                </span>
+                <span style={{ fontSize: '22px', fontWeight: 900, color: '#22c55e', letterSpacing: '-0.5px' }}>
+                  Saathi
+                </span>
               </div>
-              <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--colors-ink)' }}>
-                KaamSaathi
-              </span>
             </div>
-            <p className="body-sm" style={{ marginBottom: '16px', maxWidth: '320px' }}>
-              {lang === 'hi'
-                ? 'भारतीय गिग, डिलीवरी और असंगठित कामगारों के लिए निष्पक्ष मजदूरी, अधिकार एवं सुरक्षा का भरोसेमंद डिजिटल साथी।'
-                : 'A dedicated digital support assistant empowering India’s delivery partners, cab drivers, and informal workers with fair pay clarity, rights awareness, and dispute resolution.'}
+
+            <p style={{ fontSize: '13px', lineHeight: 1.6, color: '#94a3b8', marginBottom: '18px' }}>
+              A dedicated digital assistance portal empowering India's delivery partners, drivers, and informal platform workers with transparent payout auditing, statutory rights, and dispute drafting.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--colors-muted)' }}>
-              <span>Made with</span>
-              <Heart size={13} color="#ff4d8b" fill="#ff4d8b" />
-              <span>for India's frontline workforce</span>
-            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('dashboard')}
+              style={{
+                backgroundColor: '#0d7e48',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '9px 18px',
+                fontSize: '13px',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                transition: 'background-color 0.15s ease'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#15803d')}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0d7e48')}
+            >
+              <span>Open Worker Dashboard</span>
+              <ArrowRight size={15} />
+            </button>
           </div>
 
-          {/* Col 2: Quick Features */}
+          {/* Col 2: Worker Assistance Tools */}
           <div>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '14px', color: 'var(--colors-ink)' }}>
-              {lang === 'hi' ? 'मुख्य सुविधाएं' : 'Core Services'}
+            <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', marginBottom: '16px', letterSpacing: '0.2px' }}>
+              Worker Tools
             </h4>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
               <li>
-                <button
-                  type="button"
-                  onClick={() => onNavigate && onNavigate('dashboard', 'earnings')}
-                  className="btn-text-link"
-                  style={{ padding: 0, fontSize: '13px', color: 'var(--colors-body)' }}
+                <button 
+                  onClick={() => onNavigate('dashboard', 'earnings')} 
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13px', textAlign: 'left' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
                 >
-                  {lang === 'hi' ? 'कमाई कैलकुलेटर एवं कटौती जांच' : 'Earnings Calculator & Deductions'}
+                  › Take-Home & Expense Calculator
                 </button>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={() => onNavigate && onNavigate('dashboard', 'rights')}
-                  className="btn-text-link"
-                  style={{ padding: 0, fontSize: '13px', color: 'var(--colors-body)' }}
+                <button 
+                  onClick={() => onNavigate('dashboard', 'grievance')} 
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13px', textAlign: 'left' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
                 >
-                  {lang === 'hi' ? 'कामगार अधिकार एवं समाधान' : 'Worker Rights & Escalation Guides'}
+                  › Formal Grievance & Dispute Drafter
                 </button>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={() => onNavigate && onNavigate('dashboard', 'grievance')}
-                  className="btn-text-link"
-                  style={{ padding: 0, fontSize: '13px', color: 'var(--colors-body)' }}
+                <button 
+                  onClick={() => onNavigate('dashboard', 'rights')} 
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13px', textAlign: 'left' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
                 >
-                  {lang === 'hi' ? 'औपचारिक शिकायत पत्र जनरेटर' : 'Formal Dispute Letter Drafter'}
+                  › Worker Rights & De-activation Shield
                 </button>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={() => onNavigate && onNavigate('dashboard', 'schemes')}
-                  className="btn-text-link"
-                  style={{ padding: 0, fontSize: '13px', color: 'var(--colors-body)' }}
+                <button 
+                  onClick={() => onNavigate('dashboard', 'schemes')} 
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13px', textAlign: 'left' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
                 >
-                  {lang === 'hi' ? 'सरकारी कल्याणकारी योजनाएं' : 'Welfare Schemes & Benefits'}
+                  › Social Security & Welfare Schemes
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => onNavigate('dashboard', 'safety')} 
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13px', textAlign: 'left' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+                >
+                  › Road Safety & Incident Protocols
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => onNavigate('dashboard', 'docs')} 
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13px', textAlign: 'left' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+                >
+                  › DigiLocker Document Vault & Pass
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Emergency Reference & Demo Notice */}
+          {/* Col 3: Statutory Protections & State Boards */}
           <div>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '14px', color: 'var(--colors-ink)' }}>
-              {lang === 'hi' ? 'आपातकालीन हेल्पलाइन (भारत)' : 'Emergency Helplines (India)'}
+            <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', marginBottom: '16px', letterSpacing: '0.2px' }}>
+              Statutory Protections
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--colors-body)' }}>
-              <div>🚨 <strong>112</strong> — National All-in-One Emergency</div>
-              <div>🚑 <strong>108</strong> — Medical & Road Trauma</div>
-              <div>👷 <strong>14434</strong> — Govt Worker Grievance Helpline</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', color: '#94a3b8' }}>
+              <div>
+                <strong style={{ color: '#e2e8f0', display: 'block' }}>Social Security Code 2026</strong>
+                <span>Mandatory aggregator welfare fund contribution for health and accident insurance.</span>
+              </div>
+              <div>
+                <strong style={{ color: '#e2e8f0', display: 'block' }}>The Punjab State Gig Workers Board</strong>
+                <span>Statutory 1-2% cess tracking and 90-day dispute redressal mechanism.</span>
+              </div>
+              <div>
+                <strong style={{ color: '#e2e8f0', display: 'block' }}>National DigiPin Protocol</strong>
+                <span>4m x 4m algorithmic address precision for doorstep delivery partners.</span>
+              </div>
             </div>
+          </div>
 
-            <div
-              style={{
-                marginTop: '16px',
-                padding: '10px 12px',
-                borderRadius: 'var(--rounded-md)',
-                backgroundColor: 'rgba(232, 185, 74, 0.2)',
-                border: '1px solid rgba(232, 185, 74, 0.4)',
-                fontSize: '11px',
-                color: '#784d00',
-                lineHeight: 1.4
-              }}
-            >
-              <strong>Notice:</strong> This is an interactive hackathon demonstration prototype running 100% on local JavaScript. No live government or company systems are contacted.
+          {/* Col 4: Emergency Helplines & Support */}
+          <div>
+            <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', marginBottom: '16px', letterSpacing: '0.2px' }}>
+              Emergency Helplines
+            </h4>
+            <div style={{ fontSize: '13px', lineHeight: 1.6, color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ backgroundColor: '#dc2626', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px' }}>
+                  112
+                </span>
+                <span style={{ color: '#e2e8f0' }}>National Emergency SOS / Police</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ backgroundColor: '#2563eb', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px' }}>
+                  14434
+                </span>
+                <span style={{ color: '#e2e8f0' }}>Ministry of Labour Shram Suvidha</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ backgroundColor: '#0d7e48', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px' }}>
+                  14555
+                </span>
+                <span style={{ color: '#e2e8f0' }}>Ayushman Bharat (PM-JAY) Helpline</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ backgroundColor: '#d97706', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px' }}>
+                  1933
+                </span>
+                <span style={{ color: '#e2e8f0' }}>MANAS NCB Confidential Anti-Drug Tip</span>
+              </div>
+
+              <div style={{ marginTop: '8px', fontSize: '12px', color: '#64748b', lineHeight: 1.4 }}>
+                100% Client-Side Privacy: No user pay slips, mobile numbers, or personal chats are stored on external servers.
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Horizon line */}
-        <div
-          style={{
-            borderTop: '1px solid var(--colors-hairline)',
-            paddingTop: '24px',
-            display: 'flex',
+        {/* Bottom Bar */}
+        <div 
+          style={{ 
+            borderTop: '1px solid #1e293b', 
+            paddingTop: '20px', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
             alignItems: 'center',
-            justifyContent: 'space-between',
             flexWrap: 'wrap',
             gap: '12px',
             fontSize: '12px',
-            color: 'var(--colors-muted)'
+            color: '#64748b'
           }}
         >
           <div>
-            © 2026 KaamSaathi • Built for Hackathon Excellence • Clay Design System Standard
+            © 2026 KaamSaathi (कामसाथी) • Platform-Based Gig Worker Assistant • Open Demonstration
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
-            <span>Privacy Preserved</span>
-            <span>Zero Third-Party Trackers</span>
-            <span>Mobile-First PWA Ready</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('dashboard', 'rights')}>Worker Rights Charter</span>
+            <span>•</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('dashboard', 'docs')}>DigiPin Guide</span>
+            <span>•</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => onNavigate('dashboard')}>Launch Dashboard</span>
           </div>
         </div>
       </div>

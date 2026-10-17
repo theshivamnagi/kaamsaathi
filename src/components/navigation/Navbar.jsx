@@ -3,133 +3,202 @@ import { LanguageSwitch } from '../common/LanguageSwitch'
 import { Button } from '../common/Button'
 import { useLanguage } from '../../hooks/useLanguage'
 import { 
+  Search, 
   Menu, 
   X, 
-  Compass, 
-  LayoutDashboard, 
-  ShieldCheck, 
-  Calculator, 
-  FileText,
-  HelpCircle,
-  Sparkles
+  Moon, 
+  Sun, 
+  Globe, 
+  ArrowRight,
+  Accessibility,
+  LayoutDashboard,
+  Compass
 } from 'lucide-react'
 
 export function Navbar({ currentPage, onNavigate }) {
-  const { t, lang } = useLanguage()
+  const { t, lang, setLang } = useLanguage()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [highContrast, setHighContrast] = useState(false)
 
-  const handleNavClick = (pageId, sectionId) => {
-    setMobileMenuOpen(false)
-    if (onNavigate) {
-      onNavigate(pageId, sectionId)
+  const handleSearchSubmit = (e) => {
+    e.preventDefault()
+    if (!searchQuery.trim()) return
+    const query = searchQuery.toLowerCase()
+    if (query.includes('earn') || query.includes('pay') || query.includes('money') || query.includes('fuel')) {
+      onNavigate('dashboard', 'earnings')
+    } else if (query.includes('grievance') || query.includes('dispute') || query.includes('complaint')) {
+      onNavigate('dashboard', 'grievance')
+    } else if (query.includes('right') || query.includes('penalty') || query.includes('law')) {
+      onNavigate('dashboard', 'rights')
+    } else if (query.includes('scheme') || query.includes('welfare') || query.includes('aid')) {
+      onNavigate('dashboard', 'schemes')
+    } else if (query.includes('safe') || query.includes('emergency') || query.includes('accident')) {
+      onNavigate('dashboard', 'safety')
+    } else {
+      onNavigate('dashboard', 'schemes')
     }
   }
 
+  const toggleContrast = () => {
+    setHighContrast(!highContrast)
+    document.body.classList.toggle('high-contrast-mode')
+  }
+
   return (
-    <header className="top-nav">
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-        {/* Logo / Wordmark */}
-        <div 
-          onClick={() => handleNavClick('landing')}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '10px', 
-            cursor: 'pointer',
-            userSelect: 'none'
-          }}
-        >
-          <div
-            style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: 'var(--rounded-md)',
-              backgroundColor: 'var(--colors-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
-            }}
+    <header className="gov-header-wrap" style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 1000 }}>
+
+      {/* Main Navbar */}
+      <div className="container" style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+        {/* Left: Indian Emblem + KaamSaathi Wordmark + Digital India */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+          {/* Emblem of India */}
+          <div 
+            onClick={() => onNavigate('landing')}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
           >
-            <ShieldCheck size={22} color="#ffb084" />
+            <img 
+              src="/assets/emblem.svg" 
+              alt="Government of India Emblem" 
+              style={{ height: '42px', width: 'auto' }} 
+            />
+            
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                <span style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', fontFamily: 'Inter, sans-serif' }}>
+                  kaam
+                </span>
+                <span style={{ fontSize: '24px', fontWeight: 800, color: '#0d7e48', letterSpacing: '-0.5px', fontFamily: 'Inter, sans-serif' }}>
+                  Saathi
+                </span>
+              </div>
+              <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b', letterSpacing: '0.4px', marginTop: '-2px' }}>
+                कामगार सेवा पोर्टल
+              </span>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.5px', color: 'var(--colors-ink)', lineHeight: 1.1 }}>
-              KaamSaathi
-            </div>
-            <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--colors-muted)', letterSpacing: '0.5px' }}>
-              कामगार साथी
-            </div>
+
+          {/* Digital India Badge */}
+          <div className="desktop-only" style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '14px', display: 'flex', alignItems: 'center' }}>
+            <img 
+              src="/assets/digital-india.svg" 
+              alt="Digital India Power to Empower" 
+              style={{ height: '28px', width: 'auto' }} 
+            />
           </div>
         </div>
 
-        {/* Desktop Navigation links */}
-        <nav style={{ display: 'none' }} className="desktop-nav-links">
-          <button
-            onClick={() => handleNavClick('landing')}
-            className={`btn-text-link ${currentPage === 'landing' ? 'active-link' : ''}`}
-            style={{ fontSize: '14px', fontWeight: 500 }}
+        {/* Middle: Prominent Search Pill (myScheme signature design) */}
+        <form 
+          onSubmit={handleSearchSubmit} 
+          className="desktop-only"
+          style={{ flexGrow: 1, maxWidth: '440px', margin: '0 16px' }}
+        >
+          <div 
+            style={{ 
+              position: 'relative', 
+              display: 'flex', 
+              alignItems: 'center',
+              backgroundColor: '#ffffff',
+              borderRadius: '9999px',
+              border: '1.5px solid #cbd5e1',
+              padding: '2px 4px 2px 16px',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+            }}
           >
-            {t.navHome}
-          </button>
-          
-          <button
-            onClick={() => handleNavClick('landing', 'features-section')}
-            className="btn-text-link"
-            style={{ fontSize: '14px', fontWeight: 500 }}
-          >
-            {lang === 'hi' ? 'सुविधाएं' : 'Features'}
-          </button>
-
-          <button
-            onClick={() => handleNavClick('landing', 'how-it-works-section')}
-            className="btn-text-link"
-            style={{ fontSize: '14px', fontWeight: 500 }}
-          >
-            {lang === 'hi' ? 'कैसे काम करता है' : 'How it works'}
-          </button>
-        </nav>
-
-        {/* Right side cluster: Language selector + Dashboard CTA */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <LanguageSwitch />
-
-          {currentPage === 'landing' ? (
-            <Button
-              variant="primary"
-              size="sm"
-              icon={LayoutDashboard}
-              onClick={() => handleNavClick('dashboard')}
+            <input
+              type="text"
+              placeholder={lang === 'hi' ? 'योजना, अधिकार या समस्या खोजें...' : 'Enter scheme name or support topic to search...'}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                border: 'none',
+                outline: 'none',
+                width: '100%',
+                fontSize: '13px',
+                color: '#1e293b',
+                backgroundColor: 'transparent'
+              }}
+            />
+            <button
+              type="submit"
+              aria-label="Search"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#64748b',
+                padding: '6px 10px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
             >
-              {t.navDashboard}
-            </Button>
-          ) : (
-            <Button
-              variant="secondary"
-              size="sm"
-              icon={Compass}
-              onClick={() => handleNavClick('landing')}
-            >
-              {t.navHome}
-            </Button>
-          )}
+              <Search size={16} />
+            </button>
+          </div>
+        </form>
 
-          {/* Mobile hamburger toggle */}
+        {/* Right side tools: Green Sign In / Dashboard button + Language dropdown + Accessibility icon */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          {/* Green CTA Button (Sign In / Open Dashboard) */}
           <button
             type="button"
-            className="mobile-hamburger-btn"
+            onClick={() => onNavigate(currentPage === 'landing' ? 'dashboard' : 'landing')}
+            style={{
+              backgroundColor: '#0d7e48',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '9px 18px',
+              fontSize: '14px',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer',
+              transition: 'background-color 0.15s ease'
+            }}
+          >
+            <span>{currentPage === 'landing' ? (lang === 'hi' ? 'डैशबोर्ड खोलें' : 'Sign In') : (lang === 'hi' ? 'होम पेज' : 'Home')}</span>
+            <ArrowRight size={16} />
+          </button>
+
+          {/* Language Selector Dropdown */}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              backgroundColor: '#f1f5f9',
+              borderRadius: '6px',
+              padding: '6px 10px',
+              border: '1px solid #e2e8f0',
+              cursor: 'pointer'
+            }}
+            onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+            title="Switch Language"
+          >
+            <Globe size={15} color="#0d7e48" />
+            <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>
+              {lang === 'en' ? 'English' : 'हिन्दी'}
+            </span>
+          </div>
+
+
+          {/* Mobile hamburger menu toggle */}
+          <button
+            type="button"
+            className="mobile-only"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation menu"
             style={{
               background: 'transparent',
-              border: '1px solid var(--colors-hairline)',
-              borderRadius: 'var(--rounded-md)',
+              border: '1px solid #cbd5e1',
+              borderRadius: '6px',
               padding: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'none'
             }}
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -137,88 +206,44 @@ export function Navbar({ currentPage, onNavigate }) {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile drawer menu */}
       {mobileMenuOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '64px',
-            left: 0,
-            right: 0,
-            backgroundColor: 'var(--colors-canvas)',
-            borderBottom: '1px solid var(--colors-hairline)',
-            padding: '16px 20px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            zIndex: 100
-          }}
-        >
+        <div style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <form onSubmit={handleSearchSubmit}>
+            <input
+              type="text"
+              placeholder="Search scheme or support topic..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="text-input"
+              style={{ marginBottom: '8px' }}
+            />
+          </form>
           <button
-            onClick={() => handleNavClick('landing')}
-            className="btn-text-link"
-            style={{ textAlign: 'left', padding: '10px 0', fontSize: '15px' }}
+            onClick={() => { setMobileMenuOpen(false); onNavigate('dashboard'); }}
+            className="btn btn-primary"
+            style={{ width: '100%', backgroundColor: '#0d7e48' }}
           >
-            🏠 {t.navHome}
+            Open Worker Dashboard
           </button>
-
           <button
-            onClick={() => handleNavClick('dashboard')}
+            onClick={() => { setMobileMenuOpen(false); onNavigate('landing'); }}
             className="btn-text-link"
-            style={{ textAlign: 'left', padding: '10px 0', fontSize: '15px', fontWeight: 600 }}
+            style={{ textAlign: 'left', padding: '8px 0' }}
           >
-            ⚡ {t.navDashboard}
-          </button>
-
-          <button
-            onClick={() => handleNavClick('dashboard', 'earnings')}
-            className="btn-text-link"
-            style={{ textAlign: 'left', padding: '10px 0', fontSize: '15px' }}
-          >
-            💰 {t.actionEarningsTitle}
-          </button>
-
-          <button
-            onClick={() => handleNavClick('dashboard', 'rights')}
-            className="btn-text-link"
-            style={{ textAlign: 'left', padding: '10px 0', fontSize: '15px' }}
-          >
-            ⚖️ {t.actionRightsTitle}
-          </button>
-
-          <button
-            onClick={() => handleNavClick('dashboard', 'schemes')}
-            className="btn-text-link"
-            style={{ textAlign: 'left', padding: '10px 0', fontSize: '15px' }}
-          >
-            🏛️ {t.actionSchemesTitle}
-          </button>
-
-          <button
-            onClick={() => handleNavClick('dashboard', 'grievance')}
-            className="btn-text-link"
-            style={{ textAlign: 'left', padding: '10px 0', fontSize: '15px' }}
-          >
-            📝 {t.actionGrievanceTitle}
+            Home
           </button>
         </div>
       )}
 
       <style>{`
-        @media (min-width: 768px) {
-          .desktop-nav-links {
-            display: flex !important;
-            align-items: center;
-            gap: 16px;
-          }
-          .mobile-hamburger-btn {
+        @media (max-width: 900px) {
+          .desktop-only {
             display: none !important;
           }
-        }
-        .active-link {
-          font-weight: 700 !important;
-          color: var(--colors-primary) !important;
+          .mobile-only {
+            display: flex !important;
+          }
         }
       `}</style>
     </header>

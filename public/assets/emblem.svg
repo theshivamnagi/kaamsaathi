@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="36" height="44" fill="#333333">
+  <!-- Stylized Emblem of India Lion Capital -->
+  <path d="M50 15 C42 15 36 22 36 30 C36 34 38 38 41 41 C36 43 32 48 32 54 C32 62 38 68 46 70 L46 75 C40 76 34 80 34 85 C34 90 40 93 47 94 L47 98 L30 98 C28 98 26 100 26 102 L26 106 L74 106 L74 102 C74 100 72 98 70 98 L53 98 L53 94 C60 93 66 90 66 85 C66 80 60 76 54 75 L54 70 C62 68 68 62 68 54 C68 48 64 43 59 41 C62 38 64 34 64 30 C64 22 58 15 50 15 Z" fill="#2d3748"/>
+  <circle cx="50" cy="85" r="4" fill="#1e3a8a"/>
+  <!-- Ashoka Chakra wheel lines -->
+  <circle cx="50" cy="85" r="7" fill="none" stroke="#1e3a8a" stroke-width="1.5"/>
+  <text x="50" y="116" font-size="8" font-family="serif" font-weight="bold" text-anchor="middle" fill="#2d3748">सत्यमेव जयते</text>
+</svg>

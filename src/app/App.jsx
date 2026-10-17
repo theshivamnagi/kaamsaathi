@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { LanguageProvider } from '../hooks/useLanguage'
 import { Navbar } from '../components/navigation/Navbar'
 import { MobileBottomNav } from '../components/navigation/MobileBottomNav'
@@ -7,8 +7,9 @@ import { LandingPage } from '../pages/LandingPage'
 import { DashboardPage } from '../pages/DashboardPage'
 
 export function AppContent() {
-  const [currentPage, setCurrentPage] = useState('landing') // 'landing' | 'dashboard'
-  const [dashboardTab, setDashboardTab] = useState('overview')
+  // 'landing' | 'dashboard'
+  const [currentPage, setCurrentPage] = useState('landing')
+  const [dashboardTab, setDashboardTab] = useState('home')
 
   // Handle navigation requests from anywhere in the app
   const handleNavigate = (page, targetTabOrSection) => {
@@ -17,7 +18,7 @@ export function AppContent() {
     if (page === 'dashboard' && targetTabOrSection) {
       setDashboardTab(targetTabOrSection)
     } else if (page === 'dashboard') {
-      setDashboardTab('overview')
+      setDashboardTab('home')
     }
 
     if (page === 'landing' && targetTabOrSection) {
@@ -40,9 +41,18 @@ export function AppContent() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--colors-canvas)' }}>
-      {/* Sticky Top Navigation */}
-      <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: currentPage === 'dashboard' ? '#f8fafc' : 'var(--colors-canvas)'
+      }}
+    >
+      {/* Sticky Top Navigation for Public Landing Page only */}
+      {currentPage === 'landing' && (
+        <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
+      )}
 
       {/* Main Page Area */}
       <main style={{ flexGrow: 1 }}>
@@ -57,15 +67,19 @@ export function AppContent() {
         )}
       </main>
 
-      {/* Footer (Warm cream - strictly per Clay design system) */}
-      <Footer onNavigate={handleNavigate} />
+      {/* Footer for Public Landing Page only (Dashboard sidebar has its own footer links) */}
+      {currentPage === 'landing' && (
+        <Footer onNavigate={handleNavigate} />
+      )}
 
-      {/* Mobile-First Sticky Bottom Navigation */}
-      <MobileBottomNav
-        currentTab={currentPage === 'landing' ? '' : dashboardTab}
-        onSelectTab={handleMobileTabSelect}
-        isDashboard={currentPage === 'dashboard'}
-      />
+      {/* Mobile-First Sticky Bottom Navigation for mobile screens */}
+      {currentPage === 'landing' && (
+        <MobileBottomNav
+          currentTab={currentPage === 'landing' ? '' : dashboardTab}
+          onSelectTab={handleMobileTabSelect}
+          isDashboard={currentPage === 'dashboard'}
+        />
+      )}
     </div>
   )
 }
