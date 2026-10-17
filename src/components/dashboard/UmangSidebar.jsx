@@ -43,16 +43,6 @@ export function UmangSidebar({ activeTab = 'home', onSelectTab, isCollapsed = fa
       label: 'Welfare Schemes',
       icon: HeartHandshake
     },
-    {
-      id: 'docs',
-      label: 'Document Vault',
-      icon: FolderLock
-    },
-    {
-      id: 'punjab',
-      label: 'Punjab Gig Board',
-      icon: Award
-    }
   ]
 
   if (isCollapsed) {

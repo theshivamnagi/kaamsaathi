@@ -196,68 +196,7 @@ export function UmangHeader({
 
       {/* Right Tools: ISL Chatbot, Accessibility, Bell, Moon, Profile */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        {/* ISL Chatbot Button with Hands signing badge */}
-        <button
-          type="button"
-          onClick={onOpenISL}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: '#ffffff',
-            border: '1px solid #bbf7d0',
-            borderRadius: '8px',
-            padding: '6px 12px',
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#065f46',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease'
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#ecfdf5')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
-        >
-          <span>ISL Chatbot</span>
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#0d7e48',
-              color: '#ffffff',
-              borderRadius: '4px',
-              padding: '2px 4px',
-              fontSize: '12px',
-              fontWeight: 700
-            }}
-          >
-            🤝
-          </span>
-        </button>
 
-        {/* Accessibility Icon button */}
-        <button
-          type="button"
-          onClick={toggleAccessibility}
-          title="Accessibility & High Contrast"
-          style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '8px',
-            backgroundColor: '#f1f5f9',
-            border: 'none',
-            color: '#1e293b',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'background-color 0.15s ease'
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e2e8f0')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
-        >
-          <Accessibility size={20} />
-        </button>
 
         {/* Notification Bell button */}
         <div style={{ position: 'relative' }}>
@@ -339,29 +278,7 @@ export function UmangHeader({
           )}
         </div>
 
-        {/* Dark Mode Moon button */}
-        <button
-          type="button"
-          onClick={toggleDarkMode}
-          title="Toggle Dark Mode"
-          style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '8px',
-            backgroundColor: '#f1f5f9',
-            border: 'none',
-            color: '#1e293b',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'background-color 0.15s ease'
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e2e8f0')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
-        >
-          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
+
 
         {/* User Profile Pill: SN Shivam Nagi */}
         <div style={{ position: 'relative' }}>
